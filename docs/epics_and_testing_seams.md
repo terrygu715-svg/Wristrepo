@@ -10,11 +10,16 @@
 - T01 Done: `docs/decisions.md` exists with P01–P15 owners/evidence (MESA-framed; see §7 supersession).
 - T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). ~25 GiB free at inspection — and `Kaggledata/` (~22 GB) now sits on that same disk. E04 stays open; T16 must start with a `df` check and free-space remediation, not a download.
 - Data present locally (git-ignored): `Kaggledata/patients.csv` (80 rows) + `Kaggledata/polysomnographics/` (80 `.npy`, 40 users × 2 nights). Profiled in §7.
-- T03 Review (not Done): scaffold exists in working tree but is uncommitted (`src/sleep_apnea/contracts.py`, `schemas/*.json`, `configs/example_config.json`, `tests/test_contracts.py`, 14 tests passing). Commit it before marking Done. Until then T06/T19/T24/T26/T34 stay Blocked.
-- T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — manifest 80 files / 23,613,965,440 bytes, verify OK; E01 clears for local work. License/URL still UNVERIFIED (blocks sharing only).
-- T05 measured-half Done: `docs/kaggle_evidence.md` — M01–M08 sourced, U01–U07 open with owners. Source-doc half waits on the dataset link.
-- E-B Done (implementation + tests, 17 Sep 2026, commit `c79d223`): T06 `data/fixtures.py`, T07 `data/ingest.py`, T19 `preprocessing/fitted.py`, T24 `evaluation/metrics.py`, T25 `evaluation/compare.py`, T26 `artifacts/checkpoints.py`, T34 `coordinator.py`, T35 `generate_report.py`; 54/54 tests pass (14 T03 + 40 new). T03 Done: scaffold committed in `c79d223`, closing the §4 gate — E-B is formally unblocked.
-- Next: E-C fieldwork on measured data (T08 sample → T09 header/value audit → T10 comma-decimal labels → T11 channel identity) and the mandatory C04 redesign before T18.
+- T03 Done: scaffold committed in `c79d223`; the status note was recorded in `e8fafdc`. The §4 gate is closed.
+- T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
+- T05 Review: `docs/kaggle_evidence.md` records M01–M09 and U01–U07. Dataset description is sourced through a mirror; license, sampling rate, channel map, AHI semantics, and extreme-value meaning remain open.
+- E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 102 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
+- T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
+- T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics and quarantines `User-8-Night-1.npy` (16 channels). Full channel identity/rate and anomaly disposition are unresolved.
+- T10 Implemented/Blocked at E02: labels parse comma decimals and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and boundary evidence are still unverified.
+- T11 Provisional omit-motion decision recorded by `data/alignment.py`; it is not a substitute for the unresolved channel-map/source-doc evidence.
+- Next hard stop: T12 cannot close, and C04 redesign is mandatory before T18, because the one-night cohort has only 20 participants with class support normal 1, mild 2, moderate 7, severe 10.
+- Full ticket ledger: `docs/ticket_status.md` (active statuses for T01–T45 and C01–C04).
 - `random_forest.py` (iris demo) is out of scope for all epics. `docs/decisions.md §3` exclusions stand.
 
 ## 1. Epics (waves → epics, with gates)
@@ -38,9 +43,9 @@ Parallel rules: one schema integrator after T03; separate module owners after T1
 | Seam | Boundary | What must be tested (not a code mirror) | Primary ticket(s) | Failure if missed |
 |------|----------|------------------------------------------|-------------------|-------------------|
 | S01 Contract/ID integrity | schemas ↔ all manifests/predictions | Missing/empty/duplicate IDs rejected; class_order length-4 unique enforced | T03, T06 | Silent ID drops corrupt every downstream join |
-| S02 Acquisition integrity | network ↔ manifest | Mock interrupt resumes; corrupt bytes fail; logs contain no secret (grep test) | T07, T16 | Partial downloads treated as complete; credential leak |
+| S02 Acquisition integrity | local source ↔ manifest | For Kaggle: selected files match canonical size/hash, missing/corrupt files fail, logs contain no secret; network resume is Not applicable | T07, T08, T16 | Partial/replaced local files treated as complete; credential leak |
 | S03 Participant disjointness | splits ↔ everything | Dev/test/fold IDs disjoint; inspection IDs (T08–T17) forced to development; Full/Reduced share split hashes | T18, T23, T27 | Test contamination; inflated scores |
-| S04 Label boundaries | labels ↔ cohort | Exact AHI cut-point inclusivity (e.g. 5/15/30 ±ε), missing-label fail, summary-vs-reconstruction reconciliation | T10 (+C01) | Off-by-one class shift; invented AHI |
+| S04 Label boundaries | labels ↔ cohort | Exact AHI cut-point inclusivity (e.g. 5/15/30 ±ε), participant-level missing-label exclusion, duplicate-row rejection, summary-vs-reconstruction reconciliation | T10 (+C01) | Off-by-one class shift; invented AHI |
 | S05 Alignment/quality | raw signals ↔ masks | Synthetic offset/gap recovery; absent signal ≠ zero activity; Full/Reduced share common policy | T11, T14 (+C02) | Motion misalignment becomes fake signal |
 | S06 Cache determinism | preprocessing ↔ cache | No participant boundary crossed; hash changes with preprocessing; no globally fitted norm cached | T15 | Cache hides config change; leakage via normalization |
 | S07 Train-only fitting | splits ↔ transforms | Held-out sentinel values don't move fitted params; feature order deterministic; missing-feature fail | T19 | Scaler/imputer fitted on test |
@@ -54,38 +59,41 @@ Parallel rules: one schema integrator after T03; separate module owners after T1
 
 ## 3. Seam → test-file map (target layout)
 
-Existing: `tests/test_contracts.py` covers S01 (partial), S09/S10 (partial via schema checks).
-Add as owners clear prerequisites (do not create before T03 is committed):
+Current test files:
 
-- `tests/test_fixtures.py` — S01, S03, S06 (T06, T15, T18 properties on SYNTH_ data)
-- `tests/test_acquisition.py` — S02 (T07 mock resume/corrupt/secret-scan)
-- `tests/test_labels.py` — S04 (T10 boundaries/missing; C01 reconciliation when triggered)
-- `tests/test_alignment_quality.py` — S05 (T11/T14 offset/gap/no-zero-fill)
-- `tests/test_audit_sample.py` — S02 (sample manifest, reserved IDs), S05 (shape/dtype records, NaN mapping, 16-ch quarantine, non-2D reject, omit/proxy/E03 branches)
-- `tests/test_preprocessing.py` — S06, S07 (T15 hashes/boundaries; T19 sentinel/order)
-- `tests/test_pairing.py` — S03, S08 (T21/T23 identical IDs, Full-only absence)
-- `tests/test_metrics_compare.py` — S09, S10 (T24/T25 synthetic matrices, reorder, unmatched, n=2000)
-- `tests/test_artifacts_harness.py` — S11, S12 (T26 round-trip/version/atomic; T27 test-fit reject, stopping separation)
-- `tests/test_neural_loading.py` — S13 (T31/T32 one-target, mask, padding invariance, budget)
-- `tests/test_coordinator.py` — S14 (T34 stale-hash reject, single writer; T35 regen-no-training)
+- `tests/test_contracts.py` — S01 contract rejection.
+- `tests/test_acquisition.py` — S02 local manifest/hash/secret guard.
+- `tests/test_audit_sample.py` — S02/T08 sample join; S05 audit and omit/proxy branches.
+- `tests/test_labels.py` — S04 parsing, boundaries, duplicate rows, participant exclusions.
+- `tests/test_fixtures.py` — T06 deterministic synthetic data and fixture-level S03 tripwire.
+- `tests/test_metrics_compare.py` — S09/S10 hand-computed metrics, identity pairing, bootstrap.
+- `tests/test_artifacts.py` — S11 bundle round-trip, schema/version, object-array and atomic-failure guards.
+- `tests/test_preprocessing.py` — S07 train-only sentinel/order/math.
+- `tests/test_coordinator.py` — S14 dependency, failure, stale/running recovery, lock, report behavior.
+
+Future test files, blocked by their owning tickets: `tests/test_quality.py` (S05/T14),
+`tests/test_cache.py` (S06/T15), `tests/test_pairing.py` (S03/S08/T18/T21/T23),
+`tests/test_harness.py` (S12/T27/T33), and `tests/test_neural_loading.py`
+(S13/T31/T32).
 
 All synthetic IDs use `SYNTH_` prefix. No empirical numbers in these files.
 
-Coverage audit 17 Sep 2026 (85 tests): S01/S02/S04/S05/S07/S09/S10/S11/S14
-fully covered incl. non-degenerate cases (directional bootstrap gap,
-hand-computed weighted F1, bundle atomic-failure, fixture determinism).
-S03 covered at fixture level only (T18/T23/T27 splits future). S06/S08/S12/S13
-pending their owning tickets (T15/T21/T23/T27/T31–T33) — no placeholder tests
-written for unimplemented code.
+Coverage audit 17 Sep 2026 (102 tests): S01/S02/S04/S07/S09/S10/S11/S14
+have meaningful unit/failure-path coverage. S05 has audit/decision coverage,
+but not real synchronization or T14 masking. S03 is fixture-only. S06/S08/S12/S13
+are not implemented and have no placeholder tests. Full details and the
+remaining risks are in `docs/gap_review.md`.
 
 ## 4. STOP-AND-TEST ticket updates (amendments to .docx Done criteria)
 
 Notation: STOP = do not start listed downstream work until the test passes. Only tickets needing strengthening are listed; unlisted tickets keep their .docx Done as-is.
 
-- T03 — STOP T06/T19/T24/T26/T34 until `tests/test_contracts.py` (14 tests) passes AND working tree is committed. Amendment: Done requires a commit hash recorded in the handoff note (currently uncommitted → stays in Review).
+- T03 — STOP T06/T19/T24/T26/T34 until `tests/test_contracts.py` (14 tests) passes AND a commit hash is recorded. This gate is now cleared by `c79d223`.
 - T06 — STOP T13/T15/T19 until new `tests/test_fixtures.py` proves: class-boundary rows exist, missing-block rows exist, repeated-participant rows exist, and a leakage-check fixture fails when a participant spans splits. Amendment: fixture manifest must validate via `validate_manifest`.
-- T07 — STOP T08 until `tests/test_acquisition.py` proves mock interrupt resumes, corrupt bytes fail integrity, and a secret-scan (credential pattern grep over logs + saved config) passes. Amendment: Done requires the scan log path in the handoff.
-- T10 — STOP T12/T17 until `tests/test_labels.py` proves boundary inclusivity at every cut point (±ε both sides) and missing-label fail; sample IDs reconcile with the cited release doc. If summary AHI is inadequate: STOP and open C01; T10 stays Blocked (no generic event summation).
+- T07 — STOP T08 until `tests/test_acquisition.py` proves the local manifest catches missing/corrupt files and the secret scan passes. Network interrupt/resume is Not applicable for this already-local Kaggle source; the handoff must say so.
+- T08 — STOP T09/T10/T11 downstream interpretation until the sample manifest verifies selected file hashes against T07 and joins every inspection ID to `patients.csv`; inspection IDs are development-only.
+- T09 — STOP T11/T12 until the 16-channel anomaly has a disposition and the audit records channel count, dtype, finite-value range, NaN/Inf fractions, standard deviation, extreme count, bytes, and hash.
+- T10 — STOP T12/T17 until `tests/test_labels.py` proves boundary inclusivity at every cut point (±ε both sides), comma-decimal parsing, duplicate-row rejection, participant-level missing-label exclusions, and sample IDs reconcile. AHI semantics and boundaries still require E02 evidence. If summary AHI is inadequate: STOP and open C01; T10 stays Blocked (no generic event summation).
 - T11 — STOP T12 (when proxy selected) until offsets + missing coverage are quantified on samples in `alignment_feasibility.json`. A documented no-motion (omit) decision with evidence MAY complete T11. If alignment inconsistent: STOP and open C02 (one 120-min session, then map or omit — no repair loop).
 - T14 — STOP T15 until `tests/test_alignment_quality.py` proves absent signal is masked (never zero-filled as zero activity) and Full/Reduced use the common policy on a synthetic offset/gap case.
 - T15 — STOP T20–T22/T31 until `tests/test_preprocessing.py` proves: no cross-participant windows, cache hash changes when preprocessing changes, labels stored separately. Amendment: record cache hash in handoff.
@@ -106,10 +114,10 @@ Notation: STOP = do not start listed downstream work until the test passes. Only
 
 ## 5. Recommended next sessions (unchanged order, with stop tests inserted)
 
-1. Commit T03 (record hash) → run T04 (access note) + T05 (evidence doc) in parallel if possible.
-2. T06 fixtures + `test_fixtures.py`, then T07 + secret-scan test.
-3. T24/T25/T26/T19/T34/T35 on SYNTH_ data while access waits (each with its §3 test file).
-4. On E01 clear: T08 (reserve inspection IDs for dev) → T09/T10/T11 → T12 freeze → T13–T18 with S05–S07 stop tests.
+1. T09: resolve the two 16-channel files, sampling rate, and channel identity evidence.
+2. T10/T11: close E02/E03 only with sourced AHI semantics and an explicit motion decision.
+3. C04: redesign the cohort split for 20 labelled participants before any T18 manifest.
+4. T12 freeze, then implement T13–T18 with S05–S07 stop tests.
 
 ## 6. Acceptance check for this organization
 
@@ -131,7 +139,7 @@ Measured profile (conda Python, read 17 Sep 2026; sampling rate still UNVERIFIED
 Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 
 - E01 Access: clears on local availability + provenance/license note, not external approval. T04 rescoped to "verify Kaggle provenance, license/redistribution terms, and record a local inventory (80 files, sizes, header census)". T04 submission + inventory clears E01. No credentials exist; the no-secrets test in T07 stands as a guard, not a credential flow.
-- T05 rescoped to "audit the Kaggle dataset page/docs": signal layout, channel identities/order, sampling rate, AHI definition and sleep-time denominator, meaning of AI/HI/ODI/NAp/NHyp columns. Every §7 anomaly (16-ch files, comma decimals, 50% label missingness, extreme values) must appear as a sourced claim or explicit unknown in `docs/mesa_evidence.md` (rename or successor noted in handoff; do not strand the deliverable path).
+- T05 rescoped to "audit the Kaggle dataset page/docs": signal layout, channel identities/order, sampling rate, AHI definition and sleep-time denominator, meaning of AI/HI/ODI/NAp/NHyp columns. Every §7 anomaly (16-ch files, comma decimals, 50% label missingness, extreme values) must appear as a sourced claim or explicit unknown in `docs/kaggle_evidence.md`.
 - T07: `acquire_*.py` becomes local ingestion — manifest of all 80 files with byte sizes + hashes, header census, integrity re-check. Network resume/retry is Not applicable (record why); manifest + integrity + secret-scan stay.
 - T08: sample from local files (no transfer wait). Reserve inspected records for development; record IDs for T18 exclusion from test.
 - T09: EDF/annotation audit becomes `.npy` header + value audit — per-file shape/dtype census, inferred-vs-documented sampling rate, the two 16-channel files resolved (separate montage vs corrupt vs extra modalities), value-range/artifact report, channel-identity evidence (or explicit unknown going into T11).

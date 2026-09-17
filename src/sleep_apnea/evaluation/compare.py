@@ -60,10 +60,23 @@ def compare(
 
     participants: dict[str, list[str]] = {}
     for rec_id, row in full_rows.items():
+        reduced_row = reduced_rows[rec_id]
+        if reduced_row["participant_id"] != row["participant_id"]:
+            raise ValueError(
+                f"participant mismatch for recording_id {rec_id!r}: "
+                f"{row['participant_id']!r} != {reduced_row['participant_id']!r}"
+            )
+        if reduced_row["y_true"] != row["y_true"]:
+            raise ValueError(f"true-label mismatch for recording_id {rec_id!r}")
         pid = row["participant_id"]
         if pid not in strata:
             raise ValueError(f"participant {pid!r} has no reference stratum")
+        if strata[pid] not in order:
+            raise ValueError(f"participant {pid!r} has unknown reference stratum {strata[pid]!r}")
         participants.setdefault(pid, []).append(rec_id)
+    if set(strata) != set(participants):
+        extra = sorted(set(strata) - set(participants))
+        raise ValueError(f"strata contains unknown participants: {extra[:5]}")
     # Stratum buckets of participant ids; resample participants within strata.
     buckets: dict[str, list[str]] = {}
     for pid in participants:

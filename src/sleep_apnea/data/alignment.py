@@ -18,7 +18,19 @@ def assess(
     overlap_evidence: str | None = None,
 ) -> dict:
     """Feasibility decision: named proxy or documented omission."""
+    if not isinstance(channel_count, int) or channel_count <= 0:
+        raise ValueError("channel_count must be a positive integer")
+    if not isinstance(channel_identities_known, bool):
+        raise ValueError("channel_identities_known must be a boolean")
     motion_channels = list(motion_channels or [])
+    if len(set(motion_channels)) != len(motion_channels):
+        raise ValueError("motion_channels must not contain duplicates")
+    if any(not isinstance(channel, int) or not 0 <= channel < channel_count
+           for channel in motion_channels):
+        raise ValueError("motion_channels contains an out-of-range channel index")
+    if overlap_evidence is not None and not isinstance(overlap_evidence, str):
+        raise ValueError("overlap_evidence must be a non-empty evidence reference")
+    overlap_evidence = overlap_evidence.strip() if overlap_evidence else None
     if motion_channels and channel_identities_known and overlap_evidence:
         return {
             "decision": "proxy",

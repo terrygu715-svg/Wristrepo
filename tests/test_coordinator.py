@@ -65,6 +65,18 @@ class TestCoordinator(unittest.TestCase):
         self.assertEqual(requeued, ["a"])
         self.assertEqual(ledger.jobs["a"]["state"], "pending")
 
+    def test_resume_requeues_interrupted_running_job(self):
+        ledger = _ledger(self._tmp.name)
+        ledger.jobs["a"]["state"] = "running"
+        requeued = ledger.resume({})
+        ledger.release()
+        self.assertEqual(requeued, ["a"])
+        self.assertEqual(ledger.jobs["a"]["state"], "pending")
+
+    def test_artifact_hash_rejects_non_json_payload(self):
+        with self.assertRaises(TypeError):
+            artifact_hash({"bad": object()})
+
     def test_failed_job_survives_resume(self):
         ledger = _ledger(self._tmp.name)
         ledger.run_all({"a": lambda: 1 / 0, "b": lambda: {"v": 2}})
@@ -79,6 +91,17 @@ class TestCoordinator(unittest.TestCase):
         first.release()
         second = RunLedger(path)
         second.release()
+
+    def test_dead_owner_lock_is_recovered(self):
+        from unittest.mock import patch
+
+        path = Path(self._tmp.name) / "run.json"
+        lock = path.with_suffix(".json.lock")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        lock.write_text('{"pid": 12345}')
+        with patch("sleep_apnea.coordinator.os.kill", side_effect=ProcessLookupError):
+            ledger = RunLedger(path)
+        ledger.release()
 
     def test_single_writer_enforced(self):
         first = RunLedger(Path(self._tmp.name) / "run.json")

@@ -1,16 +1,6 @@
-"""Signal I/O package: T07 ingest + T06 fixtures live here (E-B Done).
+"""Signal I/O package.
 
-T09 sample inventory and T13 canonical readers are later epics (E-C) and
-remain unimplemented.
+T06/T07/T08/T09/T11 modules are imported explicitly to keep CLI module
+execution free of package-import side effects (for example, ``python -m
+sleep_apnea.data.ingest`` must not preload itself).
 """
-
-from sleep_apnea.data.fixtures import build_fixtures, check_participant_disjointness
-from sleep_apnea.data.ingest import build_manifest, scan_for_secrets, verify_manifest
-
-__all__ = [
-    "build_fixtures",
-    "check_participant_disjointness",
-    "build_manifest",
-    "scan_for_secrets",
-    "verify_manifest",
-]

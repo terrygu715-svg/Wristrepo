@@ -33,7 +33,7 @@
 
 ## Handoff
 
-- Acceptance evidence: M01–M08 table above; U01–U07 each named with owner
+- Acceptance evidence: M01–M09 table above; U01–U07 each named with owner
   (data reviewer) and blocking ticket.
 - Unresolved: U01 (license half) + U02–U07; source-doc half of T05 stays
   open until the license is confirmed. Measured half is Done and unblocks

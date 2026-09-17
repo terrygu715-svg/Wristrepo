@@ -17,6 +17,8 @@ from pathlib import Path
 
 import numpy as np
 
+from sleep_apnea.labels import class_of
+
 N_CHANNELS = 6
 N_SAMPLES = 6000
 RNG_SEED = 20260917
@@ -42,17 +44,6 @@ def _night_id(pid: str, split: str, seen: set[str]) -> str:
         candidate = f"{pid}_N{n}"
     seen.add(candidate)
     return candidate
-
-
-def class_of(ahi: float) -> str:
-    """Four-class mapping at 5/15/30 (lower-inclusive). Mirrors T10 intent."""
-    if ahi < 5:
-        return "normal"
-    if ahi < 15:
-        return "mild"
-    if ahi < 30:
-        return "moderate"
-    return "severe"
 
 
 def make_night(rng: np.random.Generator, missing_block: bool) -> np.ndarray:

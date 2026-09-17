@@ -21,7 +21,7 @@ STATES = ("pending", "running", "succeeded", "failed")
 def artifact_hash(payload: object) -> str:
     """Stable hash of a JSON-serializable artifact description."""
     return hashlib.sha256(
-        json.dumps(payload, sort_keys=True, default=str).encode()
+        json.dumps(payload, sort_keys=True, allow_nan=False, separators=(",", ":")).encode()
     ).hexdigest()
 
 
@@ -34,11 +34,28 @@ class RunLedger:
 
     def __init__(self, path: str | os.PathLike) -> None:
         self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
         self.lock_path = self.path.with_suffix(self.path.suffix + ".lock")
         try:
             fd = os.open(self.lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError as exc:
-            raise LedgerBusy(f"ledger {self.path} already owned") from exc
+            try:
+                owner = json.loads(self.lock_path.read_text()).get("pid")
+            except (OSError, ValueError, AttributeError):
+                owner = None
+            if isinstance(owner, int):
+                try:
+                    os.kill(owner, 0)
+                except ProcessLookupError:
+                    self.lock_path.unlink(missing_ok=True)
+                    fd = os.open(self.lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                except PermissionError:
+                    pass
+                else:
+                    raise LedgerBusy(f"ledger {self.path} already owned by pid {owner}") from exc
+            if "fd" not in locals():
+                raise LedgerBusy(f"ledger {self.path} already owned") from exc
+        os.write(fd, json.dumps({"pid": os.getpid()}).encode())
         os.close(fd)
         if self.path.exists():
             self.jobs: dict = json.loads(self.path.read_text()).get("jobs", {})
@@ -133,6 +150,10 @@ class RunLedger:
         failed jobs stay failed and visible. Returns re-queued job ids.
         """
         requeued = []
+        for job_id, job in self.jobs.items():
+            if job["state"] == "running":
+                self._set(job_id, "pending", error="recovered interrupted job")
+                requeued.append(job_id)
         for job_id, expected in expected_hashes.items():
             if job_id not in self.jobs:
                 raise ValueError(f"unknown job {job_id!r}")

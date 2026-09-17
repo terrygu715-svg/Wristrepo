@@ -124,6 +124,25 @@ class TestCompare(unittest.TestCase):
         with self.assertRaises(ValueError):
             compare(EIGHT_PERFECT, EIGHT_PERFECT, {}, "FULL", "RED")
 
+    def test_participant_mismatch_fails(self):
+        reduced = dict(EIGHT_PERFECT, rows=[dict(row) for row in EIGHT_PERFECT["rows"]])
+        reduced["rows"][0]["participant_id"] = "SYNTH_OTHER"
+        strata = dict(self.STRATA)
+        strata["SYNTH_OTHER"] = "normal"
+        with self.assertRaises(ValueError):
+            compare(EIGHT_PERFECT, reduced, strata, "FULL", "RED")
+
+    def test_true_label_mismatch_fails(self):
+        reduced = dict(EIGHT_PERFECT, rows=[dict(row) for row in EIGHT_PERFECT["rows"]])
+        reduced["rows"][0]["y_true"] = "severe"
+        with self.assertRaises(ValueError):
+            compare(EIGHT_PERFECT, reduced, self.STRATA, "FULL", "RED")
+
+    def test_extra_stratum_participant_fails(self):
+        strata = dict(self.STRATA, SYNTH_EXTRA="normal")
+        with self.assertRaises(ValueError):
+            compare(EIGHT_PERFECT, EIGHT_PERFECT, strata, "FULL", "RED")
+
 
 if __name__ == "__main__":
     unittest.main()

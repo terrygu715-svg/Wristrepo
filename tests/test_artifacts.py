@@ -80,9 +80,19 @@ class TestBundles(unittest.TestCase):
 
     def test_failed_save_leaves_no_partial_bundle(self):
         kwargs = _bundle_kwargs(meta={"bad": object()})  # not JSON-serializable
-        with self.assertRaises(TypeError):
+        with self.assertRaises((TypeError, ValueError)):
             save_bundle(self.root / "b", **kwargs)
         self.assertFalse((self.root / "b").exists())
+
+    def test_object_array_rejected(self):
+        with self.assertRaises(ValueError):
+            save_bundle(self.root / "b", **_bundle_kwargs(
+                arrays={"bad": np.array([object()], dtype=object)}
+            ))
+
+    def test_nested_parent_created(self):
+        save_bundle(self.root / "nested" / "b", **_bundle_kwargs())
+        self.assertTrue((self.root / "nested" / "b" / "model.json").exists())
 
     def test_missing_bundle_rejected(self):
         with self.assertRaises(ValueError):

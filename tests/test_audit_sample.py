@@ -22,7 +22,9 @@ def _tiny_source(root: Path) -> None:
     rng = np.random.default_rng(1)
     np.save(poly / "User-16-Night-1.npy", rng.normal(size=(6, 600)))
     np.save(poly / "User-17-Night-1.npy", rng.normal(size=(6, 610)))
-    (root / "patients.csv").write_text("user_id,night_id,AHI\n16,1,\"56,5\"\n")
+    (root / "patients.csv").write_text(
+        "user_id,night_id,AHI\n16,1,\"56,5\"\n17,1,\"15,2\"\n"
+    )
 
 
 class TestSampleManifest(unittest.TestCase):
@@ -41,6 +43,7 @@ class TestSampleManifest(unittest.TestCase):
             manifest["inspection_ids"], ["User-16-Night-1", "User-17-Night-1"]
         )
         self.assertTrue(all(r["reserved_for"] == "development" for r in manifest["records"]))
+        self.assertTrue(all(r["label_present"] for r in manifest["records"]))
         reread = json.loads(out.read_text())
         self.assertEqual(len(reread["records"]), 2)
 
@@ -48,6 +51,27 @@ class TestSampleManifest(unittest.TestCase):
         (self.src / "polysomnographics" / "User-17-Night-1.npy").unlink()
         with self.assertRaises(ValueError):
             build_sample(self.src, Path(self._tmp.name) / "out.json")
+
+    def test_source_manifest_mismatch_raises(self):
+        manifest = {
+            "records": [{"file": "User-16-Night-1.npy", "bytes": 1, "sha256": "bad"}]
+        }
+        with self.assertRaises(ValueError):
+            build_sample(self.src, Path(self._tmp.name) / "out.json",
+                         files=("User-16-Night-1.npy",), source_manifest=manifest)
+
+    def test_label_join_missing_raises(self):
+        (self.src / "patients.csv").write_text("user_id,night_id,AHI\n16,1,\"56,5\"\n")
+        with self.assertRaises(ValueError):
+            build_sample(self.src, Path(self._tmp.name) / "out.json")
+
+    def test_path_traversal_and_duplicate_selection_rejected(self):
+        with self.assertRaises(ValueError):
+            build_sample(self.src, Path(self._tmp.name) / "out.json",
+                         files=("../patients.csv",))
+        with self.assertRaises(ValueError):
+            build_sample(self.src, Path(self._tmp.name) / "out.json",
+                         files=("User-16-Night-1.npy",) * 2)
 
     def test_default_sample_pair_is_stable(self):
         self.assertEqual(SAMPLE_FILES, ("User-16-Night-1.npy", "User-17-Night-1.npy"))
@@ -71,6 +95,9 @@ class TestAudit(unittest.TestCase):
         self.assertEqual(record["shape"], [6, 6000])
         self.assertEqual(record["dtype"], "float64")
         self.assertEqual(len(record["channels"]), 6)
+        self.assertIn("std", record["channels"][0])
+        self.assertGreater(record["channels"][0]["std"], 0.0)
+        self.assertEqual(record["channels"][0]["extreme_count"], 0)
 
     def test_nan_block_detected_where_flagged(self):
         by_id = {r["recording_id"]: r for r in self.manifest["records"]}
@@ -93,6 +120,17 @@ class TestAudit(unittest.TestCase):
         with self.assertRaises(ValueError):
             audit_night(flat)
 
+    def test_extreme_nan_inf_are_separately_counted(self):
+        special = self.dir / "SPECIAL_N1.npy"
+        arr = np.zeros((2, 4), dtype=float)
+        arr[0] = [0.0, 2000.0, np.nan, np.inf]
+        np.save(special, arr)
+        record = audit_night(special)
+        channel = record["channels"][0]
+        self.assertEqual(channel["extreme_count"], 1)
+        self.assertAlmostEqual(channel["nan_fraction"], 0.25)
+        self.assertAlmostEqual(channel["inf_fraction"], 0.25)
+
 
 class TestAlignmentDecision(unittest.TestCase):
     def test_kaggle_case_omits_with_reasons(self):
@@ -110,6 +148,14 @@ class TestAlignmentDecision(unittest.TestCase):
         out = assess(6, True, motion_channels=[5])
         self.assertEqual(out["decision"], "omit")
         self.assertTrue(any("E03" in r for r in out["reasons"]))
+
+    def test_invalid_motion_index_rejected(self):
+        with self.assertRaises(ValueError):
+            assess(6, True, motion_channels=[6], overlap_evidence="map.json")
+
+    def test_blank_overlap_evidence_does_not_clear_gate(self):
+        out = assess(6, True, motion_channels=[1], overlap_evidence=" ")
+        self.assertEqual(out["decision"], "omit")
 
 
 if __name__ == "__main__":

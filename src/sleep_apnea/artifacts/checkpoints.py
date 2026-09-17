@@ -17,6 +17,7 @@ import json
 import os
 import shutil
 import tempfile
+import uuid
 from pathlib import Path
 
 import numpy as np
@@ -24,6 +25,13 @@ import numpy as np
 from sleep_apnea.contracts import validate_class_order
 
 SCHEMA_VERSION = 1
+
+
+def _remove_path(path: Path) -> None:
+    if path.is_dir():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
 
 
 def save_bundle(
@@ -55,6 +63,7 @@ def save_bundle(
             raise ValueError(f"bundle: missing or empty {field!r}")
 
     dest = Path(path)
+    dest.parent.mkdir(parents=True, exist_ok=True)
     tmp_root = Path(tempfile.mkdtemp(prefix=dest.name + ".", dir=str(dest.parent)))
     try:
         (tmp_root / "model.json").write_text(
@@ -73,11 +82,28 @@ def save_bundle(
                 indent=2,
             )
         )
+        safe_arrays = {}
+        for name, array in (arrays or {}).items():
+            if not isinstance(name, str) or not name:
+                raise ValueError("bundle array names must be non-empty strings")
+            value = np.asarray(array)
+            if value.dtype.hasobject:
+                raise ValueError(f"bundle array {name!r} cannot use object dtype")
+            safe_arrays[name] = value
         with open(tmp_root / "arrays.npz", "wb") as fh:
-            np.savez(fh, **(arrays or {}))
+            np.savez(fh, **safe_arrays)
+        backup = None
         if dest.exists():
-            shutil.rmtree(dest)
-        os.replace(tmp_root, dest)
+            backup = dest.with_name(f".{dest.name}.backup-{uuid.uuid4().hex}")
+            os.replace(dest, backup)
+        try:
+            os.replace(tmp_root, dest)
+        except BaseException:
+            if backup is not None and backup.exists() and not dest.exists():
+                os.replace(backup, dest)
+            raise
+        if backup is not None and backup.exists():
+            _remove_path(backup)
     except BaseException:
         shutil.rmtree(tmp_root, ignore_errors=True)
         raise
@@ -103,6 +129,10 @@ def load_bundle(
             f"!= {SCHEMA_VERSION}"
         )
     validate_class_order(model.get("class_order"))
+    if model.get("input_version") not in ("full", "reduced"):
+        raise ValueError(f"bundle {dest}: invalid input_version")
+    if not isinstance(model.get("feature_order"), list) or not model["feature_order"]:
+        raise ValueError(f"bundle {dest}: feature_order is missing or empty")
     if expect_config_hash is not None and model.get("config_hash") != expect_config_hash:
         raise ValueError(
             f"bundle {dest}: config_hash {model.get('config_hash')!r} "
@@ -117,7 +147,8 @@ def load_bundle(
     ):
         raise ValueError(f"bundle {dest}: class_order mismatch")
     try:
-        arrays = dict(np.load(dest / "arrays.npz", allow_pickle=False))
+        with np.load(dest / "arrays.npz", allow_pickle=False) as loaded:
+            arrays = {name: loaded[name] for name in loaded.files}
     except (OSError, ValueError) as exc:
         raise ValueError(f"bundle {dest}: unreadable arrays.npz ({exc})") from exc
     model["arrays"] = arrays

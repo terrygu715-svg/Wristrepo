@@ -10,6 +10,12 @@
   sample, or cited release doc is marked `UNVERIFIED` and assigned an owner + required evidence.
   This file unblocks T03. It does not implement models, schemas, or data access.
 
+> **Kaggle amendment:** The MESA-specific rows and sequencing below are
+> superseded by `docs/epics_and_testing_seams.md §7`, `docs/kaggle_access.md`,
+> and `docs/kaggle_evidence.md`. The active source is Kaggle
+> `yfrite/polysom`; use the Kaggle documents for current access, label, channel,
+> cohort, and storage status.
+
 ## 1. Experiment framing (adopted, not pending)
 
 These are defaults carried forward from the tickets plan. They do not change without a
@@ -68,9 +74,10 @@ Every row below must be resolved with cited evidence before its downstream gate 
 | P14 | Feature scope: HR/SpO2 shared features + Full-only ECG/airflow/effort + EEG/EOG/EMG/position bounds, channel permissions, missingness rules | Project lead (T12 gate) | `features/cardiorespiratory.py` (T20), `features/full_respiratory.py` (T21), `features/other_signals.py` (T22); no expert annotation read; units/context recorded | T20–T23 |
 | P15 | Final freeze: model settings, final rounds/epochs, seed policy, preprocessing/split hashes, bootstrap settings, test-inference policy | Project lead (T40 gate) | `release_manifest.json` + freeze review (T40); every pair has reviewed CV evidence (T37–T39); no unresolved label/leakage issue | T41–T43 |
 
-UNVERIFIED as of this commit: P02–P05 (no MESA release doc in repo), P06–P07 (no sample inspected),
-P08–P09 (no T12 sign-off yet), P10 (no `environment_report.json` yet — see T02), P11 (no cohort manifest yet).
-T05 (`docs/mesa_evidence.md`) is the designated place to convert P02/P06 unknowns into sourced claims.
+UNVERIFIED as of this planning snapshot: P02–P09 and P11 remain open under the
+Kaggle amendment; P10 has environment evidence but E04 still requires a
+bounded streaming/storage pilot. `docs/kaggle_evidence.md` is the active place
+to convert Kaggle unknowns into sourced claims.
 
 ## 3. Explicitly out of scope for the core baseline (T01 Done criterion)
 
@@ -119,15 +126,19 @@ slowest of T41/T42 → T43 → T44 → T45.
 - [x] Four night-level classes + awake input retained (§1.1–1.2).
 - [x] No AHI denominator change, event-count shortcut, or automation work in scope (§3).
 - [x] Deliverable path is `docs/decisions.md`.
-- [x] Next ready ticket: T03 (per plan: “T03 becomes ready after T01”); T02/T04/T05 were already Ready
-  and remain Ready. Recalculate readiness after each completion.
+- [x] T03 commit evidence is recorded in `docs/epics_and_testing_seams.md`;
+  T08 sample evidence is in `outputs/sample_manifest.json`.
+- [ ] T12 is not ready: E02/E03/E04/E05 evidence and the C04 cohort redesign
+  remain open.
 
 ## 7. Handoff
 
 - Implementation commit: this commit adding `docs/decisions.md` (see git log).
 - Configuration/split hash: N/A (no config or splits in T01).
 - Acceptance evidence: this file’s §6 checklist + §2 owner/evidence table + §3 exclusions.
-- Unresolved issues: all P-items UNVERIFIED pending T02/T04/T05 evidence; merged spec v2.0 source
-  file absent — inputs transcribed from tickets v1.0 only.
-- Active time: ~60 min planning allowance.
-- Newly ready ticket IDs: T03 (unblocked by T01). T02, T04, T05 remain Ready.
+- Unresolved issues: Kaggle license, sampling rate, channel map, AHI
+  semantics/boundaries, extreme-value meaning, E04 pilot, and C04 cohort
+  redesign; merged spec v2.0 source file absent.
+- Active time: ~60 min planning allowance for the original T01 snapshot.
+- Current handoff: T03/T04/T08 complete; T09/T10/T11 are review/provisional;
+  T12 and T18 remain stopped by the documented gates.
