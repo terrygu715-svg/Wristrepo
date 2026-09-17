@@ -13,7 +13,7 @@
 - T03 Review (not Done): scaffold exists in working tree but is uncommitted (`src/sleep_apnea/contracts.py`, `schemas/*.json`, `configs/example_config.json`, `tests/test_contracts.py`, 14 tests passing). Commit it before marking Done. Until then T06/T19/T24/T26/T34 stay Blocked.
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — manifest 80 files / 23,613,965,440 bytes, verify OK; E01 clears for local work. License/URL still UNVERIFIED (blocks sharing only).
 - T05 measured-half Done: `docs/kaggle_evidence.md` — M01–M08 sourced, U01–U07 open with owners. Source-doc half waits on the dataset link.
-- E-B Done (implementation + tests, 17 Sep 2026): T06 `data/fixtures.py`, T07 `data/ingest.py`, T19 `preprocessing/fitted.py`, T24 `evaluation/metrics.py`, T25 `evaluation/compare.py`, T26 `artifacts/checkpoints.py`, T34 `coordinator.py`, T35 `generate_report.py`; 54/54 tests pass (14 T03 + 40 new). T03 commit still pending (user action) before E-B is formally unblocked per §4.
+- E-B Done (implementation + tests, 17 Sep 2026, commit `c79d223`): T06 `data/fixtures.py`, T07 `data/ingest.py`, T19 `preprocessing/fitted.py`, T24 `evaluation/metrics.py`, T25 `evaluation/compare.py`, T26 `artifacts/checkpoints.py`, T34 `coordinator.py`, T35 `generate_report.py`; 54/54 tests pass (14 T03 + 40 new). T03 Done: scaffold committed in `c79d223`, closing the §4 gate — E-B is formally unblocked.
 - Next: E-C fieldwork on measured data (T08 sample → T09 header/value audit → T10 comma-decimal labels → T11 channel identity) and the mandatory C04 redesign before T18.
 - `random_forest.py` (iris demo) is out of scope for all epics. `docs/decisions.md §3` exclusions stand.
 
