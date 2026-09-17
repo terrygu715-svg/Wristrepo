@@ -1,7 +1,8 @@
 # Active Ticket Status
 
 This ledger supersedes the status wording in the original
-The original `.docx` remains an immutable planning input; this file is the
+`Sleep_Apnea_Implementation_Tickets.docx`. The original `.docx` remains an
+immutable planning input; this file is the
 active implementation board.
 
 Status vocabulary: `Done`, `Review`, `Blocked`, `Ready`, `Not applicable`.
