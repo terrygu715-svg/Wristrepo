@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wristbandcode.local/schemas/metrics.schema.json",
+  "title": "Scores computed from saved predictions (T03 contract, v1)",
+  "type": "object",
+  "required": ["schema_version", "class_order", "confusion_matrix", "accuracy", "macro_f1", "weighted_f1"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "class_order": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "confusion_matrix": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "array",
+        "minItems": 4,
+        "maxItems": 4,
+        "items": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "accuracy": { "type": "number", "minimum": 0, "maximum": 1 },
+    "macro_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+    "weighted_f1": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": true
+}

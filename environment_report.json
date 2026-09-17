@@ -1,0 +1,102 @@
+{
+  "ticket": "T02 Inspect the actual laptop environment",
+  "status": "Done",
+  "generated_utc": "2026-09-17",
+  "source_commands": [
+    "uname -a",
+    "sw_vers",
+    "sysctl hw.model hw.ncpu hw.physicalcpu hw.memsize machdep.cpu.brand_string",
+    "vm_stat",
+    "df -h",
+    "diskutil info /",
+    "system_profiler SPDisplaysDataType",
+    "~/miniconda3/bin/python -c (numpy alloc + matmul sanity, sklearn/numpy versions)"
+  ],
+  "os": {
+    "product": "macOS",
+    "product_version": "26.6.2",
+    "build": "25G83",
+    "kernel": "Darwin 25.6.0 RELEASE_ARM64_T8132",
+    "arch": "arm64",
+    "hostname_class": "Mac (Apple Silicon)"
+  },
+  "cpu": {
+    "brand_string": "Apple M4",
+    "hw_model": "Mac16,12",
+    "logical_cpus": 10,
+    "physical_cpus": 10,
+    "arm64": true
+  },
+  "memory": {
+    "total_bytes": 17179869184,
+    "total_gib": 16.0,
+    "note": "Unified memory shared between CPU and GPU (Apple Silicon). No separate VRAM."
+  },
+  "disk": {
+    "container_total": "245.1 GB (245107195904 bytes)",
+    "container_free": "26.5 GB (26517028864 bytes)",
+    "data_volume_avail": "25Gi",
+    "data_volume_capacity_used_pct": 87,
+    "root_mount_avail": "25Gi",
+    "filesystem": "APFS on internal fixed SSD, SMART Verified",
+    "note": "Only ~25 GiB free at inspection time. Bulk MESA acquisition (T16) must be budgeted under E04; do not start bulk download without a disk budget and resumable manifest (T07)."
+  },
+  "gpu": {
+    "chipset": "Apple M4",
+    "type": "Built-In GPU",
+    "cores": 8,
+    "vendor": "Apple (0x106b)",
+    "metal_support": "Metal 4",
+    "nvidia_present": false,
+    "cuda_capable_device": false,
+    "display": "Built-in Liquid Retina 2560x1664"
+  },
+  "python": {
+    "working_interpreter": "/Users/tgu27/miniconda3/bin/python",
+    "version": "3.14.7",
+    "implementation": "Anaconda, Clang 20.1.8, arm64",
+    "platform_string": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "packages": {
+      "numpy": "2.5.3",
+      "scikit-learn": "1.9.1",
+      "scipy": "1.18.1",
+      "torch": null,
+      "tensorflow": null,
+      "jax": null
+    },
+    "system_python_note": "/usr/bin/python3 is NOT usable: exits 1 with 'No developer tools were found' (Xcode CLT missing, xcode-select -p fails). All Python work must use the conda interpreter above until CLT is installed. This is recorded here so later tickets do not assume system python works."
+  },
+  "backend_verification": {
+    "cuda_assumed": false,
+    "cuda_available": false,
+    "cuda_evidence": "No NVIDIA device in system_profiler; Apple M4 GPU only; torch/tensorflow not installed so no CUDA runtime present. CUDA is NOT available on this Apple Silicon laptop.",
+    "verified_backend": "CPU",
+    "verified_evidence": "numpy 2.5.3 + sklearn 1.9.1 CPU execution verified via allocation/matmul check below on the conda interpreter.",
+    "metal_note": "Metal 4 reported by OS, but no ML framework (torch/TF) is installed to use it. MPS/GPU acceleration is UNVERIFIED and must NOT be assumed. T31 batch-fit test is the designated place to verify any future torch-MPS backend.",
+    "consequence": "E04 CPU path applies by default. Any GPU plan (T31-T33, T39, T42) requires a measured pilot demonstrating fit within RAM/disk before it can clear E04."
+  },
+  "allocation_check": {
+    "test": "numpy random (2000,2000) float64 x2 (~64 MB) + 500x500 matmul on CPU",
+    "result": "pass",
+    "matmul_sum": -1171.053,
+    "elapsed_secs": 0.16,
+    "numpy_version": "2.5.3",
+    "interpretation": "Small CPU allocation and compute succeed. This is a smoke test only, not evidence that full cohort caches or neural training fit in memory."
+  },
+  "initial_budgets": {
+    "memory_budget": "16 GiB unified. Reserve ~4 GiB for OS/browser; assume ~8-10 GiB usable for one data job. Default to ONE training/data job at a time with bounded CPU workers (per plan parallelization rules). Do not launch bulk acquisition + cache generation + training concurrently without a T16/T31 pilot measurement.",
+    "storage_budget": "~25 GiB free. Insufficient for an unbounded full-cohort download. T07 resumable manifest + T16 acquisition ledger must record actual bytes and remaining storage; E04 stays open until a bounded pilot demonstrates fit. Clean or externalize data before bulk acquisition.",
+    "runtime_expectation": "CPU-only verified. Expect longer CV/final-fit elapsed times (T37/T38/T41). A CPU path may clear E04 with revised elapsed-time expectations per gate definition; GPU/MPS timings remain UNVERIFIED."
+  },
+  "handoff": {
+    "deliverable_path": "environment_report.json",
+    "acceptance_evidence": "Backend explicitly verified as CPU (not assumed CUDA); OS/CPU/RAM/disk/GPU/Python/allocation recorded above; memory + storage budgets documented.",
+    "unresolved": [
+      "torch-MPS backend unverified (torch not installed); verify in T31 before any neural GPU claim.",
+      "Xcode CLT missing (/usr/bin/python3 broken); install or standardize on conda env and record in T03 scaffold.",
+      "Disk only 25 GiB free; E04 remains open until T16/T31 pilot demonstrates fit."
+    ],
+    "active_time_min": 60,
+    "newly_ready_tickets": "No new tickets unblocked by T02 alone; contributes E04 evidence needed for T16/T31-T33. T03 still waits on T01 (done separately); T31 depends on T02+T15+T18."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "task": "night-level four-class severity classification",
+  "class_order": ["normal", "mild", "moderate", "severe"],
+  "class_boundaries": "UNVERIFIED (P05/E02): exact AHI cut points and inclusivity pending T10/T12 evidence; placeholder names only, order is contractual",
+  "reference_ahi": "UNVERIFIED (P02/E02): exact summary variable, scoring rule, subtype coverage and sleep-time denominator pending T05/T10; AHI per sleep hour assumed, not evidenced",
+  "input_versions": ["full", "reduced"],
+  "reduced_channels": "UNVERIFIED (P08): primary Reduced set pending T12 channel manifest; Reduced must be a true subset of Full",
+  "full_channels": "UNVERIFIED (P08): Full superset pending T12; Full-only features must never leak into Reduced (T21)",
+  "motion_policy": "UNVERIFIED (P06/E03): named actigraphy proxy vs omission pending T11 alignment_feasibility.json",
+  "one_night_policy": "UNVERIFIED (P09): common interval rules, minimum coverage and deterministic one-night selection pending T12/T17",
+  "splits": "UNVERIFIED (P11/E05): 80/20 participant split + five development folds + inner stopping subsets pending T18; inspection records constrained to development",
+  "backend": "UNVERIFIED (P10/E04): CPU verified on this laptop (see environment_report.json); any GPU/MPS plan needs a T31 pilot before clearing E04",
+  "source_dir": "src",
+  "output_dir": "outputs",
+  "run_dir": "runs",
+  "metrics": ["accuracy", "macro_f1", "weighted_f1", "macro_precision", "macro_recall", "per_class", "confusion_matrices"],
+  "n_bootstrap": 2000,
+  "cv_plan": "UNVERIFIED counts: 40 fold/input jobs planned (4 models x 5 folds x 2 inputs); final 8 bundles; repeated seeds need a declared budget",
+  "unverified_fields": [
+    "class_boundaries (P05/E02)",
+    "reference_ahi variable, scoring and sleep-time denominator (P02-P04/E02)",
+    "reduced_channels and full_channels (P08/T12)",
+    "motion_policy (P06-P07/E03)",
+    "one_night_policy and coverage rules (P09/T12)",
+    "splits and cohort support (P11/E05)",
+    "backend for neural training (P10/E04)",
+    "model settings and seed policy (P15/T40)"
+  ]
+}

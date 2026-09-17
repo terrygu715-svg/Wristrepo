@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sleep-apnea-wristband"
+version = "0.1.0"
+description = "Night-level sleep apnea severity classification: Full vs Reduced input comparison (scaffold, T03)"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "scikit-learn",
+  "scipy",
+]
+# NOTE: torch / tensorflow intentionally NOT listed here. GPU/MPS backend is
+# UNVERIFIED (see environment_report.json, E04). Add only after a T31 pilot.
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "records": [
+    {"participant_id": "SYNTH_P001", "recording_id": "SYNTH_P001_N1", "split": "development"},
+    {"participant_id": "SYNTH_P002", "recording_id": "SYNTH_P002_N1", "split": "development"}
+  ]
+}

@@ -1,0 +1,21 @@
+# Source vs generated outputs are distinct (T03 Done criterion).
+# Source: src/, configs/, schemas/, tests/, docs/
+# Generated (never committed): outputs/, runs/
+outputs/*
+runs/*
+!outputs/.gitkeep
+!runs/.gitkeep
+
+# Local data (never committed): Kaggle polysomnography dump (~22G, 80 .npy + patients.csv)
+Kaggledata/
+kaggledata/
+
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.conda/
+*.egg-info/
+dist/
+build/
+.DS_Store
