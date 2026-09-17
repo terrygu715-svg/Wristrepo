@@ -72,6 +72,18 @@ class TestBundles(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_bundle(self.root / "b")
 
+    def test_overwrite_replaces_bundle(self):
+        save_bundle(self.root / "b", **_bundle_kwargs())
+        save_bundle(self.root / "b", **_bundle_kwargs(run_id="SYNTH_R2"))
+        loaded = load_bundle(self.root / "b")
+        self.assertEqual(loaded["run_id"], "SYNTH_R2")
+
+    def test_failed_save_leaves_no_partial_bundle(self):
+        kwargs = _bundle_kwargs(meta={"bad": object()})  # not JSON-serializable
+        with self.assertRaises(TypeError):
+            save_bundle(self.root / "b", **kwargs)
+        self.assertFalse((self.root / "b").exists())
+
     def test_missing_bundle_rejected(self):
         with self.assertRaises(ValueError):
             load_bundle(self.root / "nope")

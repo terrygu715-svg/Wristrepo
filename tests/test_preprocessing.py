@@ -39,6 +39,15 @@ class TestFitted(unittest.TestCase):
         # median of col a is 3.0 -> (3-3)/std == 0
         self.assertAlmostEqual(out[0, 0], 0.0)
 
+    def test_standardization_math(self):
+        by_id = {"SYNTH_T1": np.array([[0.0, 10.0], [4.0, 30.0]])}
+        fitted = fit(by_id, FEATURES, ["SYNTH_T1"])
+        # col a: mean 2, std 2; col b: mean 20, std 10
+        np.testing.assert_allclose(fitted.means, [2.0, 20.0])
+        np.testing.assert_allclose(fitted.stds, [2.0, 10.0])
+        out = fitted.transform(np.array([[4.0, 30.0]]), FEATURES)
+        np.testing.assert_allclose(out, [[1.0, 1.0]])
+
     def test_feature_order_mismatch_rejected(self):
         fitted = fit(_by_id(), FEATURES, ["SYNTH_T1"])
         with self.assertRaises(ValueError):

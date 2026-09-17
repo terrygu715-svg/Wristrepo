@@ -72,6 +72,11 @@ class TestMetrics(unittest.TestCase):
         self.assertAlmostEqual(summary["per_class"]["mild"]["f1"], 0.8)
         # moderate/severe have no support -> explicit 0.0 policy
         self.assertEqual(summary["per_class"]["severe"]["f1"], 0.0)
+        # weighted F1 = (2*(2/3) + 2*0.8) / 4
+        self.assertAlmostEqual(summary["weighted_f1"], (4 / 3 + 1.6) / 4)
+        self.assertAlmostEqual(
+            summary["macro_precision"], (1.0 + 2 / 3 + 0.0 + 0.0) / 4
+        )
 
     def test_duplicate_ids_rejected(self):
         preds = _preds([("normal", "normal")] * 2)
@@ -99,6 +104,16 @@ class TestCompare(unittest.TestCase):
         reduced = dict(EIGHT_PERFECT, rows=EIGHT_PERFECT["rows"][:-1])
         with self.assertRaises(ValueError):
             compare(EIGHT_PERFECT, reduced, self.STRATA, "FULL", "RED")
+
+    def test_degraded_reduced_gives_positive_gap(self):
+        degraded = dict(EIGHT_PERFECT, rows=[
+            dict(r, y_pred="normal") for r in EIGHT_PERFECT["rows"]
+        ])
+        out = compare(EIGHT_PERFECT, degraded, self.STRATA, "FULL", "RED")
+        self.assertGreater(out["mean_gap"], 0.0)
+        self.assertLessEqual(out["ci_low_95"], out["mean_gap"])
+        self.assertLessEqual(out["mean_gap"], out["ci_high_95"])
+        self.assertIn("condition", out["conditioning"])
 
     def test_bootstrap_count_enforced(self):
         with self.assertRaises(ValueError):

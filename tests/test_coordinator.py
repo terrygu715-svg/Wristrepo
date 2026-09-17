@@ -65,6 +65,21 @@ class TestCoordinator(unittest.TestCase):
         self.assertEqual(requeued, ["a"])
         self.assertEqual(ledger.jobs["a"]["state"], "pending")
 
+    def test_failed_job_survives_resume(self):
+        ledger = _ledger(self._tmp.name)
+        ledger.run_all({"a": lambda: 1 / 0, "b": lambda: {"v": 2}})
+        requeued = ledger.resume({"a": artifact_hash({"other": 1})})
+        ledger.release()
+        self.assertEqual(requeued, [])
+        self.assertEqual(ledger.jobs["a"]["state"], "failed")
+
+    def test_release_allows_reacquire(self):
+        path = Path(self._tmp.name) / "run.json"
+        first = RunLedger(path)
+        first.release()
+        second = RunLedger(path)
+        second.release()
+
     def test_single_writer_enforced(self):
         first = RunLedger(Path(self._tmp.name) / "run.json")
         with self.assertRaises(LedgerBusy):
@@ -103,6 +118,11 @@ class TestReport(unittest.TestCase):
         for section in REQUIRED_SECTIONS:
             self.assertIn(f"## {section}", text)
         self.assertIn("SYNTHETIC", text)
+
+    def test_non_synthetic_banner(self):
+        text = generate(**self._inputs(), synthetic=False)
+        self.assertNotIn("SYNTHETIC", text)
+        self.assertIn("FINAL REPORT", text)
 
     def test_deterministic_regeneration(self):
         self.assertEqual(generate(**self._inputs()), generate(**self._inputs()))

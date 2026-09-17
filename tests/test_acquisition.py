@@ -47,6 +47,11 @@ class TestIngest(unittest.TestCase):
         self.assertEqual(manifest["n_files"], 2)
         self.assertEqual(verify_manifest(self.root, manifest), [])
 
+    def test_header_only_manifest_verifies(self):
+        manifest = build_manifest(self.root, hash_files=False)
+        self.assertTrue(all(r["sha256"] is None for r in manifest["records"]))
+        self.assertEqual(verify_manifest(self.root, manifest), [])
+
     def test_corrupt_bytes_fail(self):
         manifest = build_manifest(self.root)
         target = self.root / "polysomnographics" / "User-1-Night-1.npy"

@@ -61,6 +61,7 @@ Add as owners clear prerequisites (do not create before T03 is committed):
 - `tests/test_acquisition.py` — S02 (T07 mock resume/corrupt/secret-scan)
 - `tests/test_labels.py` — S04 (T10 boundaries/missing; C01 reconciliation when triggered)
 - `tests/test_alignment_quality.py` — S05 (T11/T14 offset/gap/no-zero-fill)
+- `tests/test_audit_sample.py` — S02 (sample manifest, reserved IDs), S05 (shape/dtype records, NaN mapping, 16-ch quarantine, non-2D reject, omit/proxy/E03 branches)
 - `tests/test_preprocessing.py` — S06, S07 (T15 hashes/boundaries; T19 sentinel/order)
 - `tests/test_pairing.py` — S03, S08 (T21/T23 identical IDs, Full-only absence)
 - `tests/test_metrics_compare.py` — S09, S10 (T24/T25 synthetic matrices, reorder, unmatched, n=2000)
@@ -69,6 +70,13 @@ Add as owners clear prerequisites (do not create before T03 is committed):
 - `tests/test_coordinator.py` — S14 (T34 stale-hash reject, single writer; T35 regen-no-training)
 
 All synthetic IDs use `SYNTH_` prefix. No empirical numbers in these files.
+
+Coverage audit 17 Sep 2026 (85 tests): S01/S02/S04/S05/S07/S09/S10/S11/S14
+fully covered incl. non-degenerate cases (directional bootstrap gap,
+hand-computed weighted F1, bundle atomic-failure, fixture determinism).
+S03 covered at fixture level only (T18/T23/T27 splits future). S06/S08/S12/S13
+pending their owning tickets (T15/T21/T23/T27/T31–T33) — no placeholder tests
+written for unimplemented code.
 
 ## 4. STOP-AND-TEST ticket updates (amendments to .docx Done criteria)
 

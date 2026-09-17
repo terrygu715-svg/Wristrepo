@@ -60,6 +60,27 @@ class TestFixtures(unittest.TestCase):
             f"repeated participant must be flagged, got {violations}",
         )
 
+    def test_rebuild_is_deterministic(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as second:
+            build_fixtures(second)
+            for row in self.manifest["records"]:
+                name = f"{row['recording_id']}.npy"
+                np.testing.assert_array_equal(
+                    np.load(self.dir / name), np.load(Path(second) / name)
+                )
+
+    def test_missing_block_location(self):
+        arr = np.load(self.dir / "SYNTH_P003_N1.npy")
+        self.assertTrue(np.isnan(arr[0, 2000:3000]).all())
+        self.assertFalse(np.isnan(arr[1]).any())
+        violations = check_participant_disjointness(self.manifest["records"])
+        self.assertTrue(
+            any("SYNTH_P005" in v for v in violations),
+            f"repeated participant must be flagged, got {violations}",
+        )
+
     def test_clean_manifest_passes_disjointness(self):
         dev_only = [r for r in self.manifest["records"] if r["split"] == "development"]
         self.assertEqual(check_participant_disjointness(dev_only), [])
