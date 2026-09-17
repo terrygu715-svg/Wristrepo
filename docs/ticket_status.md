@@ -9,6 +9,23 @@ Status vocabulary: `Done`, `Review`, `Blocked`, `Ready`, `Not applicable`.
 `Done` means the implementation evidence and the ticket-specific tests are
 present. It does not clear a later scientific or protocol gate.
 
+## Progress Snapshot
+
+Last verified 17 September 2026:
+
+- `main` is pushed through commit `1052e1e`.
+- GitHub tracker: 14 issues closed (T01–T04, T06–T08, T19, T24–T26,
+  T34–T35, and C01); 35 issues remain open because they are review,
+  provisional, blocked, or pending.
+- Verification: 102/102 tests pass; Python compilation passes.
+- Data integrity: `outputs/kaggle_manifest.json` verifies `Kaggledata/` with
+  `OK: Kaggledata`; current free disk is 19 GiB (historical low was 17 GiB).
+- Generated evidence: `outputs/sample_manifest.json` is source-manifest and
+  `patients.csv` verified; `outputs/sample_inventory.json` quarantines the
+  16-channel anomaly; `outputs/label_table.json` contains 20 selected labels,
+  20 excluded participants, and 40 excluded source rows.
+- The original ticket `.docx` is unchanged; this ledger is the active board.
+
 ## Gates
 
 | Gate | Status | Evidence / blocker |
@@ -16,7 +33,7 @@ present. It does not clear a later scientific or protocol gate.
 | E01 Access | Cleared locally | `docs/kaggle_access.md`, `outputs/kaggle_manifest.json`, 80 files verified. |
 | E02 Label definition | Open | Kaggle AHI scoring rule, denominator, subtype coverage, and exact boundaries are not sourced. |
 | E03 Motion/alignment | Provisional | Omit-motion path is documented; channel map and alignment evidence remain unknown. |
-| E04 Capacity | Open | CPU verified; current local disk can be as low as 17 GiB free; no bounded cache/neural pilot yet. |
+| E04 Capacity | Open | CPU verified; current free disk is 19 GiB (historical low 17 GiB); no bounded cache/neural pilot yet. |
 | E05 Cohort support | Open | One-night cohort has 20 participants with class counts normal 1, mild 2, moderate 7, severe 10. C04 is mandatory. |
 
 ## Tickets

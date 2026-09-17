@@ -14,6 +14,7 @@
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
 - T05 Review: `docs/kaggle_evidence.md` records M01–M09 and U01–U07. Dataset description is sourced through a mirror; license, sampling rate, channel map, AHI semantics, and extreme-value meaning remain open.
 - E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 102 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
+- GitHub progress: 14 finished/not-applicable issues are closed; all review, provisional, blocked, and pending issues remain open. The pushed documentation head is `1052e1e`.
 - T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
 - T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics and quarantines `User-8-Night-1.npy` (16 channels). Full channel identity/rate and anomaly disposition are unresolved.
 - T10 Implemented/Blocked at E02: labels parse comma decimals and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and boundary evidence are still unverified.

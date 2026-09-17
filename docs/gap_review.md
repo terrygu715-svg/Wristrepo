@@ -59,9 +59,9 @@ test confidence, not a claim that the research pipeline is complete.
   inner stopping/outer scoring separation, or neural epoch isolation.
 - **S13/T31/T32:** No neural loader/model exists; padding/mask invariance and
   measured RAM/backend fit are untested.
-- **T02/E04:** The local dump is ~22 GiB and free disk was measured as low as
-  17 GiB. No cache or training job should start until a streaming storage and
-  RAM budget is measured again at execution time.
+- **T02/E04:** The local dump is ~22 GiB; current free disk is 19 GiB and the
+  historical low was 17 GiB. No cache or training job should start until a
+  streaming storage and RAM budget is measured again at execution time.
 
 ## Stop Rules
 
@@ -69,5 +69,5 @@ test confidence, not a claim that the research pipeline is complete.
 2. Do not run T18 or any model training before the C04 split redesign is
    documented and its participant-disjointness tests pass.
 3. Do not treat T08/T09 sample outputs as empirical model results.
-4. Do not claim S06/S08/S12/S13 coverage from the current 98-test count;
+4. Do not claim S06/S08/S12/S13 coverage from the current 102-test count;
    their owning implementations and seam tests are absent.
