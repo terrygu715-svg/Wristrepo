@@ -26,8 +26,8 @@ Follow these steps in order. Do not skip ahead. Confirm each step before continu
 
 ## Step 2 — Clone repo and check out this branch
 
-1. Clone: `gh repo clone <OWNER>/Wristrepo` (replace OWNER with the actual owner;
-   if you don't know it, run `gh repo list --limit 5` or ask me and stop).
+1. Clone: `git clone https://github.com/terrygu715-svg/Wristrepo.git` (or
+   `gh repo clone terrygu715-svg/Wristrepo`).
 2. `cd Wristrepo`.
 3. `git fetch origin` then `git checkout reticket/simplified-flight` (exact name).
 4. Verify: `git branch --show-current` must print `reticket/simplified-flight`,
@@ -65,9 +65,12 @@ Do not continue past this step until the dataset is confirmed in the repository.
 3. Upgrade pip: `python -m pip install --upgrade pip`.
 4. Install project deps: `python -m pip install -e ".[dev]"` (reads `pyproject.toml`:
    numpy, scikit-learn, scipy, pytest).
-5. Install the model backends: `python -m pip install xgboost` and
-   `python -m pip install torch --index-url https://download.pytorch.org/whl/cpu`
-   (CPU wheel first; GPU/MPS variants only if a later ticket justifies them — record which).
+5. Install the model backends: `python -m pip install xgboost` and GPU torch —
+   Windows/Linux with NVIDIA: `python -m pip install torch --index-url https://download.pytorch.org/whl/cu121`
+   (CUDA 12.1 build; pick the matching CUDA if yours differs — record which).
+   macOS Apple Silicon: `python -m pip install torch` (MPS backend, no CUDA wheel).
+   Verify with `python -c "import torch; print(torch.__version__, torch.cuda.is_available())"`.
+   CPU-only torch is NOT acceptable here — if no GPU/MPS is present, stop and report.
 6. Record versions: `python -c "import numpy, sklearn, scipy, xgboost, torch; ..."`.
    Save the full `python -m pip freeze` output to `ticket0_freeze.txt` (untracked scratch,
    do not commit it).
