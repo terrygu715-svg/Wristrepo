@@ -55,18 +55,28 @@ demo / wrist-relevant subset / methods spike), we should not carry its gates.
   7.9 GiB free storage gate, 116-test E-B infra as reference
 - [ ] Simplification target = fewer tickets, fewer STOP cascades, epic-grouped specs
 
-## 4. Draft epic grouping for straight-numbered tickets (for user to guide)
+## 4. Agreed implementation path (user direction, 24 Sep 2026 — supersedes 12-step draft)
 
-1. Goal of the rebuild: feasibility demo / wrist-transfer spike / minimal publishable baseline?
-2. Tag scheme: `W-xx` + `M1/M2` (recommended) or other?
-3. Cohort: keep 20-participant one-night rule, or cut to a smaller dev slice (e.g. N=6–8) for speed?
-4. Task: ~~simplify?~~ KEEP 4-class (agreed).
-5. Models: XGBoost + CNN, no change (agreed).
-6. Mechanics: blank rewrite on this branch (agreed — deferred until ticket 01).
-7. Ticket count: user to guide. Proposal below keeps same gates but merges the 45
-   into ~12 straight-numbered tickets.
+Straight numbers `0–7`, grouped by epic specs. Old 12-step table in §5 is scrapped.
 
-## 5. Proposed straight-numbered flight (same scope, fewer tickets — edit me)
+| # | Epic | Title | Done = |
+|---|---|---|---|
+| 0 | Epic A — Foundation | Environment + dependency assess (dataset assumed local) | `environment_report.json`-equivalent refreshed: Python/deps (numpy, sklearn, xgb, torch/CNN backend), CPU/CUDA/MPS, RAM/disk vs ~22 GiB local dump; missing-dep list; no downloads |
+| 1 | Epic B — Data audit | Data audit + freeze (keep from old flight) | 6-EEG contract (omit-motion, quarantine 2×16-ch), comma-decimal AHI parse, 20 labels + exclusions, one-night rule frozen in a single config |
+| 2 | Epic C — Splits | Train/eval/test split on local dataset | Versioned manifests, participant-disjoint, same split reused by all later tickets; support counts recorded |
+| 3 | Epic D — Baseline | Single XGBoost on full-data labels | XGB 4-class pipeline wired to full feature set on downloaded data; trains without error on train split |
+| 4 | Epic D — Baseline score | Train + record metrics (single XGB) | Accuracy + F-measure (macro/weighted) + confusion matrix on eval (and test policy stated); saved predictions + run metadata |
+| 5 | Epic E — Full matrix | Remaining 4-class XGB + CNN setup | XGB variants + CNN classifier implemented with batched loading (stream windows, never whole nights; see `docs/epics_and_testing_seams.md` T31/S13 batch-fit rule) |
+| 6 | Epic E — Matrix train | All 4 checkpoints: partial/full × XGB/CNN | 4 runs (partial-XGB, full-XGB, partial-CNN, full-CNN) trained on ticket-02 train split with batching; checkpoints saved |
+| 7 | Epic F — Compare | Peak acc + F + CM per checkpoint, same split | Peak-checkpoint metrics per run on the identical split; confusion matrices side-by-side; no split re-rolls |
+
+Notes:
+- "4 checkpoints" = the 2×2 matrix in ticket 6 (partial/full × XGBoost/CNN).
+- "Partial vs full data" = Reduced-subset vs Full feature set (Reduced stays a true subset; shared IDs/labels per old S08).
+- Batching is mandatory in 5/6 per old S13/T31 (6×~6M float64 ≈ 275 MB/night — stream, don't load whole).
+- Metrics in 4/7 mirror old T24/T25 intent (accuracy, F, CM) but on the frozen ticket-02 split only.
+
+## 5. Scrapped: 12-step draft (kept for history, not active)
 
 | # | Epic | Title (merges old) | Done = |
 |---|---|---|---|
@@ -86,4 +96,4 @@ demo / wrist-relevant subset / methods spike), we should not carry its gates.
 Old STOP-AND-TEST seams S01–S14 fold into the Done column above instead of 14 separate gates.
 Storage ledger (old T16) becomes a pre-condition on 06, not a standalone ticket — confirm?
 
-## 6. Next steps (user-guided)
+## 6. Next steps (user-guided): freeze epic specs for 0–7, then blank-rewrite src/ starting at 0.
