@@ -122,12 +122,25 @@
   encoders → masked mean over valid windows → 4-class head; keep small (no attention /
   Mamba / tuning sweeps); shape/gradient pass, masked-padding invariance, bundle
   round-trip, no window-level event label; (e) neural tests
-  `tests/test_neural_loading.py` (S13); (f) checkpoint formats per run.
+  `tests/test_neural_loading.py` (S13); (f) checkpoint formats per run;
+  (g) PREPROCESSING: per-channel normalization scoped train-only — fit scalers
+  (e.g. mean/std or robust equivalents) on train IDs only, store fitted params in the
+  checkpoint bundle, apply identically at eval; never fit on eval/test; missing blocks
+  stay masked (no zero-fill as signal); normalization params versioned with the config
+  hash so a preprocessing change invalidates old checkpoints;
+  (h) RESUMABLE BATCH TRAINING: stream windows in fixed-size batches with a persistent
+  run ledger (epoch/batch cursor + RNG state + optimizer state saved per checkpoint);
+  every N batches write an atomic interim checkpoint; on stop/interrupt, resume from
+  the newest valid checkpoint cursor — never from scratch, never a partial-batch
+  overwrite; a stop halfway loses at most the in-flight batch; resume rejects stale
+  config/split hashes.
 - Standing prohibitions: no torch/TF dep before the batch pilot justifies it;
   no pre-trained/downloaded weights; no fine-tuning.
 - Deliverable (docs only): matrix build spec with batching rules.
 - Done when: partial/full lists frozen; CNN loader + arch + batch policy written;
-  batching mandatory and sized (never whole-night loads).
+  batching mandatory and sized (never whole-night loads); train-only normalization
+  spec'd with versioned params; interrupt-safe resume spec'd (cursor + atomic interim
+  checkpoints, ≤1 batch loss).
 
 ## Ticket 6 — Train all 4 checkpoints (partial/full × XGB/CNN)
 
@@ -139,8 +152,12 @@
   only (never test; epoch selection isolated from outer/test); mini smoke runs first
   (complete → save → reload, finite losses); (c) checkpoint save + provenance per run;
   (d) run ledger: pending/running/succeeded/failed visible, resume rejects stale hashes,
-  workers write distinct outputs; (e) backend: CPU verified path; one 6 × ~6M float64
-  night ≈ 275 MB — stream, don't load whole.
+  workers write distinct outputs; (e) backend: GPU path per ticket 0; one 6 × ~6M float64
+  night ≈ 275 MB — stream, don't load whole; (f) preprocessing applied per ticket-5g
+  (train-fitted normalization reused from bundle, never refit mid-run);
+  (g) resumability per ticket-5h: interrupt-safe — `stop` resumes from the newest
+  interim checkpoint cursor with identical results as an uninterrupted run; halvway
+  stops lose at most one batch; ledger shows exact resume point.
 - Deliverable (docs only): run matrix sheet (4 rows × config/seed/checkpoint/metric target).
 - Done when: all 4 runs specified with batch + stopping + checkpoint rules; same-split
   discipline stated.

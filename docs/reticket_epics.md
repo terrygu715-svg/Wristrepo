@@ -54,6 +54,9 @@ Spec parents: T20 (partial = HR + SpO₂ only) + T21/T22 (full additions) + T31/
 (streaming night dataset, padding/masks, batch fits budget) + T32/T33 (CNN arch + training).
 Matrix = partial/full × XGBoost/CNN = 4 checkpoints. Batching mandatory
 (6 ch × ~6M float64 ≈ 275 MB/night — stream windows, never whole nights).
+Preprocessing is train-only normalization (fitted on train IDs, versioned with config).
+Training is interrupt-safe: atomic interim checkpoints + ledger cursor, resume without
+data loss (≤1 in-flight batch).
 All runs use the ticket-02 train split; checkpoints saved with provenance.
 
 ## Epic F — Compare (ticket 7)
