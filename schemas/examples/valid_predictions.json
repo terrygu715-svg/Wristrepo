@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "class_order": ["normal", "mild", "moderate", "severe"],
-  "rows": [
-    {"participant_id": "SYNTH_P001", "recording_id": "SYNTH_P001_N1", "y_true": "normal", "y_pred": "mild"},
-    {"participant_id": "SYNTH_P002", "recording_id": "SYNTH_P002_N1", "y_true": "severe", "y_pred": "severe"}
-  ]
-}
