@@ -51,7 +51,7 @@ Last verified 24 September 2026:
 | T07 | Done | Local Kaggle manifest, streaming hashes, verify CLI, secret guard; network resume is Not applicable. |
 | T08 | Done | `outputs/sample_manifest.json`; two pre-registered files match T07 and `patients.csv`, reserved for development. |
 | T09 | Done | `outputs/sample_inventory.json`; all audited files have complete stats, byte counts, hashes, and per-channel values. Both 16-channel files are quarantined and excluded from the six-channel contract; no remap is inferred. Sampling/channel semantics remain documented unknowns for T11/T12. |
-| T10 | Implemented/Blocked E02 | Comma decimals, boundaries, duplicate rejection, 20 labelled participants + 20 participant exclusions. Source AHI semantics still open. |
+| T10 | Done/Blocked E02 | Real-header/first-row, comma-decimal, boundary, duplicate, and missing-label tests pass. The label table contains 20 selected participants, 20 participant exclusions, and 40 retained source-row exclusions; AHI semantics remain an E02 gate. |
 | T11 | Provisional/Blocked E03 | Omit-motion decision helper and tests. Need source/channel evidence or signed omission evidence before T12. |
 | T12 | Blocked | E02/E03/E04/E05 evidence and channel/quality contract are not frozen. |
 | T13 | Blocked by T12 | Canonical `.npy` signal reader not started. |

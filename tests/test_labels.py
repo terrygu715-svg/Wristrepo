@@ -48,6 +48,16 @@ class TestLabelTable(unittest.TestCase):
         row = next(r for r in self.rows if r["recording_id"] == "KAGGLE_U16_N1")
         self.assertAlmostEqual(row["ahi"], 56.5)
 
+    def test_real_header_and_first_rows_are_readable(self):
+        with self.CSV.open(newline="") as fh:
+            header = fh.readline().strip().split(",")
+            first_rows = [fh.readline().strip().split(",") for _ in range(3)]
+        self.assertEqual(header[:3], ["user_id", "night_id", "age"])
+        self.assertIn("AHI", header)
+        self.assertEqual(len(first_rows), 3)
+        self.assertTrue(all(len(row) == len(header) for row in first_rows))
+        self.assertEqual(first_rows[0][0:2], ["16", "1"])
+
     def test_boundary_inclusivity(self):
         cases = [(4.9, "normal"), (5.0, "mild"), (14.9, "mild"), (15.0, "moderate"),
                  (29.9, "moderate"), (30.0, "severe"), (125.0, "severe")]

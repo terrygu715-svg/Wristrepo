@@ -53,6 +53,23 @@ dataset version 3, last updated 2024-06-12.
   API documentation gives no units, scaling, or saturation guidance; U07 stays
   open and no clipping is permitted.
 
+## T10 label audit
+
+The real `Kaggledata/patients.csv` header and first three rows were read
+read-only and match the expected 14-column layout, including `user_id`,
+`night_id`, and `AHI`. The parser accepts both dot and comma decimals (the
+real file contains comma-decimal values such as `17,7`), applies lower-
+inclusive provisional boundaries `[5, 15, 30]`, rejects duplicate user/night
+rows and invalid numeric/boundary values, and never substitutes night 2 when
+selected night 1 is unlabelled.
+
+The generated label table contains 20 selected night-1 participants and 20
+participant-level exclusions, with all 40 missing-AHI source rows retained for
+audit. XML/event reconstruction is not applicable because this source provides
+the summary AHI field but no XML or event annotations. The exact AHI scoring
+and denominator remain an E02 unknown, so these labels are operationally
+parsed but not yet scientifically cleared.
+
 ## Explicit unknowns (each blocks its gate until sourced)
 
 | # | Unknown | Blocks |

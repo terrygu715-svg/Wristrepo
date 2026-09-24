@@ -144,7 +144,7 @@ Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 - T07: `acquire_*.py` becomes local ingestion — manifest of all 80 files with byte sizes + hashes, header census, integrity re-check. Network resume/retry is Not applicable (record why); manifest + integrity + secret-scan stay.
 - T08: sample from local files (no transfer wait). Reserve inspected records for development; record IDs for T18 exclusion from test.
 - T09: EDF/annotation audit becomes `.npy` header + value audit — per-file shape/dtype census, inferred-vs-documented sampling rate, the two 16-channel files resolved (separate montage vs corrupt vs extra modalities), value-range/artifact report, channel-identity evidence (or explicit unknown going into T11).
-- T10: `labels.py` parses `patients.csv` with comma-decimal handling (`17,7` → 17.7 must be a test case, S04). Missing AHI (20 users) → documented exclusion with reasons, never silent drop. C01 (XML reconstruction) is Not applicable to this source — record why instead of opening it.
+- T10 Done/Blocked E02: `labels.py` parses the real `patients.csv` header/first rows with comma-decimal handling (`17,7` → 17.7), lower-inclusive provisional boundaries, duplicate rejection, and explicit missing-AHI exclusions. The output retains 20 labelled participants, 20 participant exclusions, and 40 excluded source rows. C01 (XML reconstruction) is Not applicable because no XML/event source is present; AHI scoring semantics still block E02.
 - T11: 6 channels are currently unnamed. T11 must either identify a motion/actigraphy channel with overlap evidence or take the documented omit-motion (HR + SpO₂) path — a no-motion result still completes the ticket. E03 clears either way with evidence.
 - T12: Reduced/Full sets are chosen from the verified Kaggle channels (≤6 + resolution of 16-ch anomalies), not MESA montages. T13–T15 read `.npy`, not EDF.
 - T16: no download. Deliverable becomes a storage-verification ledger: `df` before/after, 22 GB accounted, free-space remediation (clean or externalize) if below the T02 budget. STOP: no cache generation (T15/T23) until E04 clears on measured free space.
@@ -157,6 +157,6 @@ New STOP-AND-TEST additions from §7 (append to §4):
 
 - T05 STOP T10/T12 until the evidence doc records the sampling rate, channel identities (or unknown), AHI definition/denominator, and all four §7 anomalies with sources.
 - T09 STOP is cleared for T11–T14 regarding anomaly disposition: both 16-channel files are quarantined/excluded and the regression test asserts the finalized reason. T11/T12 remain gated by unresolved channel semantics and E02/E03 evidence.
-- T10 STOP T12/T17 until comma-decimal parsing, boundary inclusivity, and missing-label exclusion tests pass on the real `patients.csv` header/first-rows (read-only; no signal inspection beyond counts).
+- T10 STOP is cleared for T12/T17 regarding parser mechanics: comma-decimal parsing, boundary inclusivity, and missing-label exclusion tests pass on the real `patients.csv` header/first rows. E02 AHI semantics and denominator remain a separate stop.
 - T16 STOP T15/T23 cache work until the storage ledger shows fit within the T02 budget.
 - T18 STOP T23 and everything downstream until the C04 redesign is documented and its split manifests pass disjointness + support tests.
