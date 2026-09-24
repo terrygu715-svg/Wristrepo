@@ -20,7 +20,8 @@ Last verified 24 September 2026:
   provisional, blocked, or pending.
 - Verification: 116/116 tests pass; Python compilation passes.
 - Data integrity: `outputs/kaggle_manifest.json` verifies `Kaggledata/` with
-  `OK: Kaggledata`; current free disk is 19 GiB (historical low was 17 GiB).
+  `OK: Kaggledata`; the T16 ledger measured 8.2 GiB free, superseding the
+  earlier 19 GiB reading.
 - Generated evidence: `outputs/sample_manifest.json` is source-manifest and
   `patients.csv` verified; `outputs/sample_inventory.json` quarantines the
   16-channel anomaly; `outputs/label_table.json` contains 20 selected labels,
@@ -34,7 +35,7 @@ Last verified 24 September 2026:
 | E01 Access | Cleared locally | `docs/kaggle_access.md`, `outputs/kaggle_manifest.json`, 80 files verified. |
 | E02 Label definition | Open | Kaggle AHI scoring rule, denominator, subtype coverage, and exact boundaries are not sourced. |
 | E03 Motion/alignment | Provisional | Omit-motion path is documented; channel map and alignment evidence remain unknown. |
-| E04 Capacity | Open | CPU verified; current free disk is 19 GiB (historical low 17 GiB); no bounded cache/neural pilot yet. |
+| E04 Capacity | Open | CPU verified; T16 ledger records 8.2 GiB free against the documented budget; no bounded cache/neural pilot yet. |
 | E05 Cohort support | Open | One-night cohort has 20 participants with class counts normal 1, mild 2, moderate 7, severe 10. C04 is mandatory. |
 
 ## Tickets
@@ -56,7 +57,7 @@ Last verified 24 September 2026:
 | T13 | Blocked by T12 | Canonical `.npy` signal reader not started. |
 | T14 | Blocked by T12/T11 | Quality masks and no-zero-fill policy not implemented. |
 | T15 | Blocked by T14/E04 | Window cache and cache-hash tests not implemented. |
-| T16 | Blocked by E04 | Bulk acquisition is Not applicable; storage ledger/remediation still required before cache work. |
+| T16 | Review/Blocked by E04 | `docs/storage_ledger.md` records 23.6 GB accounted and 8.2 GiB free; reclaim or externalize storage, then repeat before cache work. |
 | T17 | Blocked by T12/T14/T16 | Full paired cohort audit not frozen. |
 | T18 | Blocked by C04/E05 | Original 80/20 + five-fold design is unsupported; redesign required before splits. |
 | T19 | Done | Train-only fitted transforms with held-out sentinel/order tests. |
