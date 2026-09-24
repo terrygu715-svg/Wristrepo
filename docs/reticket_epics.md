@@ -19,9 +19,9 @@ Spec parents: T09 (channel inventory) + T10 (labels) + T11 (alignment) + T12 (co
 Derive on the local copy: per-file shape/dtype census, 16-ch disposition, comma-decimal
 AHI parse → label table (participants, exclusions, class counts at 5/15/30 provisional),
 channel contract: Full set vs partial (HR + SpO₂ only per T20) vs omit-motion.
-Storage gate (ticket 1, binding): any patient/night missing the actigraphy required for
-the partial-data path is gated out and its local copy deleted to reduce storage —
-deletion logged by file hash + bytes reclaimed; no silent drops, no remap.
+Storage gate (ticket 1, binding): join PSG file list to label/actigraphy availability and
+drop null columns/rows missing the actigraphy required for the partial path; log dropped
+IDs + bytes reclaimed. No signing, no remap.
 Known gap to resolve in this epic: prior audit measured 6 EEG rows only with no HR/SpO₂
 time series (`docs/kaggle_evidence.md`, `docs/alignment_feasibility.md`) — ticket 1 must
 confirm or refute HR/SpO₂ availability; tickets 3–6 cannot proceed as spec'd if absent.
@@ -42,10 +42,10 @@ Spec parents: T23 (paired matrices, one row/night) + T27/T28 (harness + XGB adap
 Ticket 3 wires the pipeline on the train split; ticket 4 trains and records
 accuracy + F-measure + confusion matrix on the frozen split with saved predictions
 and run metadata. Test-split policy stated, not consumed early.
-MANUAL QA GATE (binding, most important): no work on Epic E (tickets 5–6) begins until
-a human reviews and signs the Epic D QA record — see tickets 3–4 QA plan (feature
-provenance, train-only discipline, reload match, metric/CM sanity, split-reuse proof).
-A failed QA item blocks the matrix; fixes re-enter Epic D, never bypass.
+MANUAL QA GATE (binding, most important): the implementer works the ticket-3/ticket-4
+checklists (split-hash reuse, ID/label identity, no partial leakage, reload match,
+CM-vs-metric reconciliation, failure handling, handoff fields) before Epic E (tickets 5–6).
+Any open box blocks the matrix; fixes re-enter Epic D, never bypass.
 
 ## Epic E — 4-checkpoint matrix (tickets 5–6)
 
