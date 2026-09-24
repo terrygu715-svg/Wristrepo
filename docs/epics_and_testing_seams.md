@@ -16,7 +16,7 @@
 - E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 116 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
 - GitHub progress: 14 finished/not-applicable issues are closed; all review, provisional, blocked, and pending issues remain open. Seam correction commit `c97b91d` is the current implementation head.
 - T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
-- T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics for the registered samples and both 16-channel anomalies (`User-8-Night-1.npy`, `User-14-Night-2.npy`). Full channel identity/rate and anomaly disposition are unresolved.
+- T09 Done: `outputs/sample_inventory.json` records value statistics for the registered samples and both 16-channel anomalies (`User-8-Night-1.npy`, `User-14-Night-2.npy`). The anomalies are quarantined and excluded from the six-channel contract; their extra rows are unmapped and are not remapped or zero-filled.
 - T10 Implemented/Blocked at E02: labels parse comma decimals and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and boundary evidence are still unverified.
 - T11 Provisional omit-motion decision recorded by `data/alignment.py`; it is not a substitute for the unresolved channel-map/source-doc evidence.
 - Next hard stop: T12 cannot close, and C04 redesign is mandatory before T18, because the one-night cohort has only 20 participants with class support normal 1, mild 2, moderate 7, severe 10.
@@ -156,7 +156,7 @@ Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 New STOP-AND-TEST additions from §7 (append to §4):
 
 - T05 STOP T10/T12 until the evidence doc records the sampling rate, channel identities (or unknown), AHI definition/denominator, and all four §7 anomalies with sources.
-- T09 STOP T11–T14 until the 16-channel anomaly has a disposition (quarantine, remap, or documented exclusion) covered by a regression test.
+- T09 STOP is cleared for T11–T14 regarding anomaly disposition: both 16-channel files are quarantined/excluded and the regression test asserts the finalized reason. T11/T12 remain gated by unresolved channel semantics and E02/E03 evidence.
 - T10 STOP T12/T17 until comma-decimal parsing, boundary inclusivity, and missing-label exclusion tests pass on the real `patients.csv` header/first-rows (read-only; no signal inspection beyond counts).
 - T16 STOP T15/T23 cache work until the storage ledger shows fit within the T02 budget.
 - T18 STOP T23 and everything downstream until the C04 redesign is documented and its split manifests pass disjointness + support tests.

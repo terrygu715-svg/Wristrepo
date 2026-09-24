@@ -112,7 +112,8 @@ class TestAudit(unittest.TestCase):
         inventory = audit_sample([self.dir / "SYNTH_P001_N1.npy", odd])
         self.assertEqual(len(inventory["records"]), 1)
         self.assertEqual(len(inventory["quarantined"]), 1)
-        self.assertIn("T09 disposition", inventory["quarantined"][0]["reason"])
+        self.assertIn("quarantined", inventory["quarantined"][0]["reason"])
+        self.assertIn("excluded", inventory["quarantined"][0]["reason"])
 
     def test_quarantined_record_retains_complete_evidence(self):
         odd = self.dir / "ODD_N1.npy"

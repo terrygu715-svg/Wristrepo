@@ -50,7 +50,7 @@ Last verified 24 September 2026:
 | T06 | Done | Deterministic SYNTH_ fixtures, boundary/missingness/leakage tripwires; tested. |
 | T07 | Done | Local Kaggle manifest, streaming hashes, verify CLI, secret guard; network resume is Not applicable. |
 | T08 | Done | `outputs/sample_manifest.json`; two pre-registered files match T07 and `patients.csv`, reserved for development. |
-| T09 | Review/Blocked | `outputs/sample_inventory.json`; both 16-channel files now have complete stats, byte counts, hashes, and quarantine records. Resolve rate/channel map/anomaly disposition. |
+| T09 | Done | `outputs/sample_inventory.json`; all audited files have complete stats, byte counts, hashes, and per-channel values. Both 16-channel files are quarantined and excluded from the six-channel contract; no remap is inferred. Sampling/channel semantics remain documented unknowns for T11/T12. |
 | T10 | Implemented/Blocked E02 | Comma decimals, boundaries, duplicate rejection, 20 labelled participants + 20 participant exclusions. Source AHI semantics still open. |
 | T11 | Provisional/Blocked E03 | Omit-motion decision helper and tests. Need source/channel evidence or signed omission evidence before T12. |
 | T12 | Blocked | E02/E03/E04/E05 evidence and channel/quality contract are not frozen. |

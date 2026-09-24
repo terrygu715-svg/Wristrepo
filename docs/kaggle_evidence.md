@@ -37,8 +37,11 @@ dataset version 3, last updated 2024-06-12.
 
 - **16 channels:** local header census found `User-8-Night-1` and
   `User-14-Night-2` with 16 rows, while the publisher documents six EEG rows.
-  The extra rows have no source mapping. They remain quarantined under T09;
-  this is a documented source/data discrepancy, not a remapping decision.
+  The extra rows have no source mapping; rows 6-15 are zero-valued in both
+  audited files. T09 disposition is **quarantine and exclude both files from
+  the six-channel contract**. No remapping, zero-fill, or channel identity is
+  inferred. The inventory records this disposition with bytes, hashes, and
+  per-channel statistics.
 - **Comma decimals:** the local `patients.csv` uses values such as `17,7`;
   this is a file-format observation and is handled by T10 parsing. The API page
   does not specify the delimiter/decimal convention.
