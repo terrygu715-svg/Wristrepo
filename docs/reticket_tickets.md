@@ -28,12 +28,16 @@
   (b) `patients.csv` header/row probe, comma-decimal parse, AHI → 4 classes at
   provisional 5/15/30 with boundary + duplicate + missing-label rules; (c) channel
   freeze: Full set vs partial = HR + SpO₂ only (T20) vs omit-motion (T11);
-  (d) one-night-per-participant rule + exclusion list; (e) emit label table draft
-  (selected / excluded / class counts) for ticket 2.
+  (d) one-night-per-participant rule + exclusion list; (e) STORAGE GATE: list every
+  patient/night missing the actigraphy required for the partial path, gate them out,
+  delete their local copies (log hash + bytes reclaimed per file, keep the gate list);
+  (f) emit label table draft (selected / excluded / class counts) for ticket 2.
 - Deliverable (docs only): audit + freeze note with file census, label table, channel
-  manifest, open unknowns (AHI scoring/denominator per E02; HR/SpO₂ presence flag).
-- Done when: counts reconcile (files ↔ labels ↔ exclusions); 16-ch disposition stated;
-  HR/SpO₂ availability confirmed or refuted in writing; boundaries + rules recorded.
+  manifest, storage-gate deletion log, open unknowns (AHI scoring/denominator per E02;
+  HR/SpO₂ presence flag).
+- Done when: counts reconcile (files ↔ labels ↔ exclusions ↔ deletions); 16-ch disposition
+  stated; gated-missing-actigraphy list + reclaimed bytes recorded; HR/SpO₂ availability
+  confirmed or refuted in writing; boundaries + rules recorded.
 - Gate: if HR/SpO₂ time series absent, tickets 3–6 proceed only under a written
   deviation (no silent remap).
 
@@ -60,8 +64,13 @@
 - Deliverable (docs only): pipeline spec wired end-to-end on paper (no code).
 - Done when: every stage (features → fit → checkpoint → predict) has inputs/outputs
   named; train-only fitting + ID discipline stated.
+- QA plan (ticket 3 half — reviewed by human before Epic E): (a) full feature list
+  traces each feature to a frozen channel; Reduced ⊂ Full check stated;
+  (b) XGB config + seeds + stopping/weighting policy pinned; (c) train-only
+  fit/transform scoping provable on paper (held-out sentinel reasoning);
+  (d) checkpoint + metadata fields enumerated.
 
-## Ticket 4 — Train single XGB + record metrics
+## Ticket 4 — Train single XGB + record metrics (+ QA sign-off)
 
 - Epic: D. Depends on: 3. Spec: T24 (metrics) + T36 (reload discipline).
 - Purpose: define the scored record for the baseline.
@@ -71,10 +80,18 @@
   matrix + per-class scores from saved predictions; (d) save predictions + run metadata.
 - Deliverable (docs only): metrics-record template (what is stored, how reload-match is checked).
 - Done when: metric set + CM layout + reload check + test policy all written.
+- MANUAL QA GATE (most important — human sign-off required before tickets 5–6):
+  reviewer checks (1) split reuse exact (ticket-02 hash match, no re-roll);
+  (2) IDs/labels identical across Full/partial rows; (3) no excluded-channel leakage
+  into partial; (4) reloaded predictions reproduce scores with matched IDs;
+  (5) CM rows/columns reconcile with reported accuracy/F; (6) failure/drop handling
+  explicit. Sign with name + date + go/no-go. No-go returns to ticket 3/4;
+  Epic E never starts on a no-go.
 
 ## Ticket 5 — Remaining 4-class XGB + CNN setup
 
-- Epic: E. Depends on: 1, 2. Spec: T20 + T21 + T22 + T31 + T32.
+- Epic: E. Depends on: 1, 2 + Epic-D QA sign-off (go). Spec: T20 + T21 + T22 + T31 + T32.
+  No Epic E work starts on a no-go.
 - Purpose: define the other pipelines: XGB variant(s) on partial + CNN classifiers.
 - Inputs: partial (HR + SpO₂ only, T20) + full (T21/T22 additions) manifests; split.
 - Plan: (a) partial vs full feature lists with provenance (Reduced ⊂ Full);
