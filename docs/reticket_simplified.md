@@ -71,10 +71,20 @@ Straight numbers `0–7`, grouped by epic specs. Old 12-step table in §5 is scr
 | 7 | Epic F — Compare | Peak acc + F + CM per checkpoint, same split | Peak-checkpoint metrics per run on the identical split; confusion matrices side-by-side; no split re-rolls |
 
 Notes:
-- "4 checkpoints" = the 2×2 matrix in ticket 6 (partial/full × XGBoost/CNN).
-- "Partial vs full data" = Reduced-subset vs Full feature set (Reduced stays a true subset; shared IDs/labels per old S08).
-- Batching is mandatory in 5/6 per old S13/T31 (6×~6M float64 ≈ 275 MB/night — stream, don't load whole).
-- Metrics in 4/7 mirror old T24/T25 intent (accuracy, F, CM) but on the frozen ticket-02 split only.
+- Dataset: https://www.kaggle.com/datasets/yfrite/polysom (assumed local; no re-download).
+- "Partial data" = HR + SpO₂ only, per spec T20 (`features/cardiorespiratory.py` — shared HR-level
+  trends/variability + SpO₂ with context/missingness rules). "Full data" = partial + T21
+  (ECG/airflow/effort) + T22 (EEG/EOG/EMG/position). Reduced stays a true subset (old S08).
+- Ticket-02 split = spec T18: 80/20 participant split + five development folds, IDs disjoint,
+  inspection records constrained to development, Full/Reduced share hashes. Exact counts are
+  derived in ticket 1/2 implementation against the local copy (20 labelled participants expected
+  per prior audit: 1/2/7/10 — insufficient for 80/20+5-fold without revision; ticket 1 must state
+  the actual rule used).
+- Labels = spec T10: verified summary AHI preferred, 4 classes, boundaries recorded; comma-decimal
+  handling for this source.
+- ⚠ Known gap carried in: this Kaggle source measured 6 EEG rows only with no HR/SpO₂ time series
+  (see `docs/kaggle_evidence.md`, `docs/alignment_feasibility.md`). Ticket 1 must confirm or refute
+  HR/SpO₂ availability on the local copy before tickets 3–6 can proceed as spec'd.
 
 ## 5. Scrapped: 12-step draft (kept for history, not active)
 
