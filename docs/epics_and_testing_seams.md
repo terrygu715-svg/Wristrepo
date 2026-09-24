@@ -8,7 +8,7 @@
 ## 0. Repo reality check (recalculated frontier)
 
 - T01 Done: `docs/decisions.md` exists with P01–P15 owners/evidence (MESA-framed; see §7 supersession).
-- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). ~25 GiB free at inspection — and `Kaggledata/` (~22 GB) now sits on that same disk. E04 stays open; T16 must start with a `df` check and free-space remediation, not a download.
+- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). The latest T16 ledger measured 8.2 GiB free while `Kaggledata/` (~22 GB) sits on that disk. E04 stays open; T16 requires remediation, not a download.
 - Data present locally (git-ignored): `Kaggledata/patients.csv` (80 rows) + `Kaggledata/polysomnographics/` (80 `.npy`, 40 users × 2 nights). Profiled in §7.
 - T03 Done: scaffold committed in `c79d223`; the status note was recorded in `e8fafdc`. The §4 gate is closed.
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
@@ -16,7 +16,7 @@
 - E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 116 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
 - GitHub progress: 14 finished/not-applicable issues are closed; all review, provisional, blocked, and pending issues remain open. Seam correction commit `c97b91d` is the current implementation head.
 - T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
-- T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics and quarantines `User-8-Night-1.npy` (16 channels). Full channel identity/rate and anomaly disposition are unresolved.
+- T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics for the registered samples and both 16-channel anomalies (`User-8-Night-1.npy`, `User-14-Night-2.npy`). Full channel identity/rate and anomaly disposition are unresolved.
 - T10 Implemented/Blocked at E02: labels parse comma decimals and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and boundary evidence are still unverified.
 - T11 Provisional omit-motion decision recorded by `data/alignment.py`; it is not a substitute for the unresolved channel-map/source-doc evidence.
 - Next hard stop: T12 cannot close, and C04 redesign is mandatory before T18, because the one-night cohort has only 20 participants with class support normal 1, mild 2, moderate 7, severe 10.
@@ -135,7 +135,7 @@ Measured profile (conda Python, read 17 Sep 2026; sampling rate still UNVERIFIED
 - `Kaggledata/polysomnographics/`: 80 `.npy`, float64. 78 files are `(6, ~5.19–6.94M)` samples ≈ 7.2–9.6 h at an assumed 200 Hz. 2 anomalies with **16 channels**: `User-8-Night-1.npy`, `User-14-Night-2.npy`. One probed file spans −3541…+3395 with per-channel means near 0 — extreme values need T09 explanation (artifact vs unit), not silent clipping.
 - `Kaggledata/patients.csv`: 80 rows (40 users × nights 1–2). Decimals use **commas** (`17,7`). Only **20 of 40 users have any AHI** (both nights labelled or neither). Labelled nights = 40, class split at 5/15/30: severe 20, moderate 15, mild 4, normal 1.
 - One-night-per-participant rule → at most **20 labelled nights**. 80/20 + 5-fold over ~16 dev participants with 1 normal total is indefensible — **C04 triggers by measurement, not opinion** (see T17/T18 below).
-- `Kaggledata/` is git-ignored and lives on the ~25 GiB-free disk from T02. Storage, not download, is the T16 risk.
+- `Kaggledata/` is git-ignored and lives on the disk measured at 8.2 GiB free by T16. Storage, not download, is the T16 risk.
 
 Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 

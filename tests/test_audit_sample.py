@@ -114,6 +114,16 @@ class TestAudit(unittest.TestCase):
         self.assertEqual(len(inventory["quarantined"]), 1)
         self.assertIn("T09 disposition", inventory["quarantined"][0]["reason"])
 
+    def test_quarantined_record_retains_complete_evidence(self):
+        odd = self.dir / "ODD_N1.npy"
+        np.save(odd, np.zeros((16, 600)))
+        record = audit_sample([odd])["quarantined"][0]
+        self.assertEqual(record["dtype"], "float64")
+        self.assertEqual(record["bytes"], odd.stat().st_size)
+        self.assertEqual(len(record["sha256"]), 64)
+        self.assertEqual(len(record["channels"]), 16)
+        self.assertIn("nan_fraction", record["channels"][0])
+
     def test_non_2d_rejected(self):
         flat = self.dir / "FLAT_N1.npy"
         np.save(flat, np.zeros(600))

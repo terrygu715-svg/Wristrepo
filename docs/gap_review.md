@@ -49,8 +49,9 @@ confidence, not a claim that the research pipeline is complete.
 - **T05/E02:** AHI scoring rule, sleep-time denominator, subtype coverage, and
   exact category boundary evidence are still not sourced. The current 5/15/30
   values are explicit provisional defaults, not a cleared scientific gate.
-- **T09/E03:** The 16-channel files are quarantined, but their extra channels
-  are not identified. Sampling rate and per-channel identities remain open.
+- **T09/E03:** Both 16-channel files are fully audited and quarantined, but
+  their extra channels are not identified. Sampling rate and per-channel
+  identities remain open.
 - **T11/T14:** The omit-motion decision is provisional. No synchronization map
   or artifact/coverage mask implementation exists; S05 has decision/audit
   tests, not real alignment tests.

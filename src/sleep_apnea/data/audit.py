@@ -81,8 +81,10 @@ def audit_sample(paths: list[str | os.PathLike]) -> dict:
         "schema_version": 1,
         "records": records,
         "quarantined": [
-            {"file": r["file"], "shape": r["shape"],
-             "reason": "non-6-channel layout; T09 disposition required before T11-T14"}
+            {
+                **r,
+                "reason": "non-6-channel layout; T09 disposition required before T11-T14",
+            }
             for r in quarantined
         ],
     }

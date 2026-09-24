@@ -27,8 +27,9 @@
 - `patients.csv`: present, 3692 bytes,
   sha256 `2e344d3…a3d0339` (full hash in manifest). Comma decimals; AHI
   present for 20/40 users (both nights or neither).
-- Disk at verification: 228 Gi total, 17 Gi avail. The dump fills the T02
-  budget — E04 stays open; T16 storage ledger + T15/T23 streaming required.
+- Historical disk verification: 228 Gi total, 17 Gi avail. The latest T16
+  ledger measured 8.2 GiB free. The dump fills the T02 budget; E04 stays open
+  and T15/T23 streaming remains blocked pending remediation.
 
 ## Handoff
 
