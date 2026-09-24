@@ -11,13 +11,14 @@ present. It does not clear a later scientific or protocol gate.
 
 ## Progress Snapshot
 
-Last verified 17 September 2026:
+Last verified 24 September 2026:
 
-- `main` is pushed through commit `919564d`.
+- `main` includes seam correction commit `c97b91d`; this documentation sync
+  records its verification state.
 - GitHub tracker: 14 issues closed (T01–T04, T06–T08, T19, T24–T26,
   T34–T35, and C01); 35 issues remain open because they are review,
   provisional, blocked, or pending.
-- Verification: 102/102 tests pass; Python compilation passes.
+- Verification: 116/116 tests pass; Python compilation passes.
 - Data integrity: `outputs/kaggle_manifest.json` verifies `Kaggledata/` with
   `OK: Kaggledata`; current free disk is 19 GiB (historical low was 17 GiB).
 - Generated evidence: `outputs/sample_manifest.json` is source-manifest and
