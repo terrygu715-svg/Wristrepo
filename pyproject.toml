@@ -16,7 +16,7 @@ dependencies = [
 # UNVERIFIED (see environment_report.json, E04). Add only after a T31 pilot.
 
 [project.optional-dependencies]
-dev = []
+dev = ["pytest"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
