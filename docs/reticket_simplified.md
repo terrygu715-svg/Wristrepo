@@ -106,4 +106,5 @@ Notes:
 Old STOP-AND-TEST seams S01–S14 fold into the Done column above instead of 14 separate gates.
 Storage ledger (old T16) becomes a pre-condition on 06, not a standalone ticket — confirm?
 
-## 6. Next steps (user-guided): freeze epic specs for 0–7, then blank-rewrite src/ starting at 0.
+## 6. Ticket docs (active): `docs/reticket_epics.md` (Epics A–F) + `docs/reticket_tickets.md`
+(tickets 0–7). Docs only — no env work, no code, per user direction.
