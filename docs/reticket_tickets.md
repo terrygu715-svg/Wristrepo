@@ -20,7 +20,7 @@
 ## Ticket 1 — Data audit + freeze (derive labels + split inputs)
 
 - Epic: B. Depends on: 0. Spec: T09 + T10 + T11 + T12; evidence: `kaggle_evidence.md`,
-  `alignment_feasibility.md`, `cohort_redesign.md`.
+  `alignment_feasibility.md` (both kept on this branch; all other old-flight docs live on `main`).
 - Purpose: freeze the channel/label/cohort contract; derive the label table and the
   participant list ticket 2 will split.
 - Inputs: local `Kaggledata/` (80 `.npy` + `patients.csv`); Kaggle page for provenance.

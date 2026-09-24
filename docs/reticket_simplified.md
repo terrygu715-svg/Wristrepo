@@ -6,7 +6,8 @@
 
 ## 1. Why the old flight is too complex for what we're building
 
-Carried from `docs/` on `main` (a9894ab):
+Carried from `docs/` on `main` (a9894ab). The old-flight source files below were removed
+from this branch to avoid ambiguity — they remain on `main` for reference.
 
 - **45 core tickets + 4 conditional (78.5 h plan)** across 7 epics (E-A…E-G), 14 testing seams
   (S01…S14), 14 STOP-AND-TEST gates, 5 evidence gates (E01–E05). Source:
@@ -66,7 +67,7 @@ Straight numbers `0–7`, grouped by epic specs. Old 12-step table in §5 is scr
 | 2 | Epic C — Splits | Train/eval/test split on local dataset | Versioned manifests, participant-disjoint, same split reused by all later tickets; support counts recorded |
 | 3 | Epic D — Baseline | Single XGBoost on full-data labels | XGB 4-class pipeline wired to full feature set on downloaded data; trains without error on train split |
 | 4 | Epic D — Baseline score | Train + record metrics (single XGB) | Accuracy + F-measure (macro/weighted) + confusion matrix on eval (and test policy stated); saved predictions + run metadata |
-| 5 | Epic E — Full matrix | Remaining 4-class XGB + CNN setup | XGB variants + CNN classifier implemented with batched loading (stream windows, never whole nights; see `docs/epics_and_testing_seams.md` T31/S13 batch-fit rule) |
+| 5 | Epic E — Full matrix | Remaining 4-class XGB + CNN setup | XGB variants + CNN classifier implemented with batched loading (stream windows, never whole nights; spec T31 batch-fit rule) |
 | 6 | Epic E — Matrix train | All 4 checkpoints: partial/full × XGB/CNN | 4 runs (partial-XGB, full-XGB, partial-CNN, full-CNN) trained on ticket-02 train split with batching; checkpoints saved |
 | 7 | Epic F — Compare | Peak acc + F + CM per checkpoint, same split | Peak-checkpoint metrics per run on the identical split; confusion matrices side-by-side; no split re-rolls |
 
