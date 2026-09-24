@@ -8,7 +8,7 @@
 ## 0. Repo reality check (recalculated frontier)
 
 - T01 Done: `docs/decisions.md` exists with P01–P15 owners/evidence (MESA-framed; see §7 supersession).
-- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). The latest T16 ledger measured 7.9 GiB free while `Kaggledata/` (~22 GB) sits on that disk. E04 stays open; T16 requires remediation, not a download.
+- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). T16 trim verification records 24 GiB free with a reduced `Kaggledata/` working set and a completed bounded CPU streaming pilot. E04 is cleared for that policy; neural-specific capacity remains separate.
 - Data present locally (git-ignored): `Kaggledata/patients.csv` (80 rows) + `Kaggledata/polysomnographics/` (80 `.npy`, 40 users × 2 nights). Profiled in §7.
 - T03 Done: scaffold committed in `c79d223`; the status note was recorded in `e8fafdc`. The §4 gate is closed.
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
@@ -162,7 +162,7 @@ Measured profile (conda Python, read 17 Sep 2026; sampling rate still UNVERIFIED
 - `Kaggledata/polysomnographics/`: 80 `.npy`, float64. 78 files are `(6, ~5.19–6.94M)` samples ≈ 7.2–9.6 h at an assumed 200 Hz. 2 anomalies with **16 channels**: `User-8-Night-1.npy`, `User-14-Night-2.npy`. One probed file spans −3541…+3395 with per-channel means near 0 — extreme values need T09 explanation (artifact vs unit), not silent clipping.
 - `Kaggledata/patients.csv`: 80 rows (40 users × nights 1–2). Decimals use **commas** (`17,7`). Only **20 of 40 users have any AHI** (both nights labelled or neither). Labelled nights = 40, class split at 5/15/30: severe 20, moderate 15, mild 4, normal 1.
 - One-night-per-participant rule → at most **20 labelled nights**. 80/20 + 5-fold over ~16 dev participants with 1 normal total is indefensible — **C04 triggers by measurement, not opinion** (see T17/T18 below).
-- `Kaggledata/` is git-ignored and lives on the disk measured at 7.9 GiB free by T16. Storage, not download, is the T16 risk.
+- `Kaggledata/` is git-ignored and uses a reduced 20-file working set; T16 records 24 GiB free after trim. Storage, not download, remains the E04 risk until the pilot.
 
 Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 
@@ -174,7 +174,7 @@ Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 - T10 Done/Blocked E02: `labels.py` parses the real `patients.csv` header/first rows with comma-decimal handling (`17,7` → 17.7), lower-inclusive provisional boundaries, duplicate rejection, and explicit missing-AHI exclusions. The output retains 20 labelled participants, 20 participant exclusions, and 40 excluded source rows. C01 (XML reconstruction) is Not applicable because no XML/event source is present; AHI scoring semantics still block E02.
 - T11 Done: six EEG channels are documented, with no motion/HR/SpO2 time series or overlap evidence. The documented omit-motion path is selected for both inputs and E03 clears for alignment; T12 still freezes the channel/feature contract.
 - T12: Reduced/Full sets are chosen from the verified Kaggle channels (≤6 + resolution of 16-ch anomalies), not MESA montages. T13–T15 read `.npy`, not EDF.
-- T16: no download. Deliverable becomes a storage-verification ledger: `df` before/after, 22 GB accounted, free-space remediation (clean or externalize) if below the T02 budget. Latest check is 7.9 GiB free, so T16 remains blocked and no cache generation (T15/T23) is allowed until E04 clears.
+- T16 Done: no download. The ledger records `df` before/after, original 22 GB provenance, reduced working-set size, and a 20-file 1 MiB-chunk streaming pilot at ~322 MiB peak RSS with no cache writes. E04 is cleared for bounded CPU streaming; T15/T23 remain gated by T14/T12.
 - T17: eligible cohort is at most the 20 labelled participants (one night each). Cohort flow report must show the 20 unlabelled users excluded by rule and class support per split/fold plan.
 - T18: STOP — E05 cannot clear on the original 80/20 + 5-fold design (normal n=1). C04 selects 20 participant-level leave-one-participant-out outer folds with fixed a priori settings; T18 must produce versioned manifests and disjointness/support tests before any downstream CV.
 - T23 scale note: development matrices are ~16 nights (post-C04), not a MESA-scale cohort. Pairing tests (S08) are unchanged and matter more at this n.

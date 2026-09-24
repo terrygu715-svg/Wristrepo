@@ -71,7 +71,9 @@ confidence, not a claim that the research pipeline is complete.
   inner stopping/outer scoring separation, or neural epoch isolation.
 - **S13/T31/T32:** No neural loader/model exists; padding/mask invariance and
   measured RAM/backend fit are untested.
-- **T02/E04/T16:** The local dump is ~22 GiB; the T16 ledger measured 7.9 GiB
+- **T02/E04/T16:** The original local dump was ~22 GiB; storage trim leaves a
+  20-file working set and 24 GiB free. E04 still needs a bounded streaming
+  pilot before cache or training work.
   free on 24 September, below the documented operating budget. No cache or
   training job should start until storage is reclaimed or externalized and a
   bounded streaming storage/RAM budget is measured again.

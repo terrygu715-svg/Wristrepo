@@ -9,9 +9,8 @@
 
 - Source: https://www.kaggle.com/datasets/yfrite/polysom ("Polysomnographic
   sleep data", publisher yfrite, updated 2024-06-12 per dataset mirror —
-  matches local file dates). Local copy `Kaggledata/` (git-ignored):
-  `patients.csv` (80 rows) + `polysomnographics/` (80 `.npy`, 40 users ×
-  nights 1–2).
+  matches local file dates). The original local copy was reduced for storage;
+  see `docs/working_set.md` for the retained 20-file working set.
 - UNVERIFIED: license/redistribution terms (Kaggle pages require login to
   confirm; not confirmed 17 Sep 2026). Until confirmed, treat the data as
   all-rights-reserved local input — no redistribution, no upload of derived
@@ -27,9 +26,9 @@
 - `patients.csv`: present, 3692 bytes,
   sha256 `2e344d3…a3d0339` (full hash in manifest). Comma decimals; AHI
   present for 20/40 users (both nights or neither).
-- Historical disk verification: 228 Gi total, 17 Gi avail. The latest T16
-  ledger measured 7.9 GiB free. The dump fills the T02 budget; E04 stays open
-  and T15/T23 streaming remains blocked pending remediation.
+- Storage remediation: 60 unselected `.npy` files were removed from the local
+  working copy. The latest T16 ledger records 24 GiB free after trim; E04 still
+  requires a bounded streaming pilot before cache work.
 
 ## Handoff
 

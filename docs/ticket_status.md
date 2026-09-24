@@ -20,8 +20,9 @@ Last verified 24 September 2026:
   provisional, blocked, or pending.
 - Verification: 116/116 tests pass; Python compilation passes.
 - Data integrity: `outputs/kaggle_manifest.json` verifies `Kaggledata/` with
-  `OK: Kaggledata`; the latest T16 ledger measured 7.9 GiB free, superseding the
-  earlier 19 GiB reading.
+  the original 80-file manifest remains provenance; the reduced working set is
+  documented in `docs/working_set.md`. The latest T16 ledger measured 24 GiB
+  free after trim.
 - Generated evidence: `outputs/sample_manifest.json` is source-manifest and
   `patients.csv` verified; `outputs/sample_inventory.json` quarantines the
   16-channel anomaly; `outputs/label_table.json` contains 20 selected labels,
@@ -32,10 +33,10 @@ Last verified 24 September 2026:
 
 | Gate | Status | Evidence / blocker |
 |---|---|---|
-| E01 Access | Cleared locally | `docs/kaggle_access.md`, `outputs/kaggle_manifest.json`, 80 files verified. |
+| E01 Access | Cleared locally | `docs/kaggle_access.md`, original manifest provenance, and reduced working-set record. |
 | E02 Label definition | Open | Kaggle AHI scoring rule, denominator, subtype coverage, and exact boundaries are not sourced. |
 | E03 Motion/alignment | Cleared for omit-motion | `docs/alignment_feasibility.md` documents absent motion/HR/SpO2 time series and the explicit omit decision; T12 still freezes the resulting channel/feature contract. |
-| E04 Capacity | Open | CPU verified; T16 ledger records 7.9 GiB free against the documented budget; no bounded cache/neural pilot yet. |
+| E04 Capacity | Cleared for bounded CPU streaming | T16 ledger records 24 GiB free and a 20-file, 1 MiB-chunk pilot at ~322 MiB peak RSS; neural/backend-specific pilot remains separate. |
 | E05 Cohort support | Open | One-night cohort has 20 participants with class counts normal 1, mild 2, moderate 7, severe 10. C04 redesign is complete; T18 manifests/support tests remain. |
 
 ## Tickets
@@ -48,7 +49,7 @@ Last verified 24 September 2026:
 | T04 | Done | `docs/kaggle_access.md`; URL, local provenance, manifest, and integrity verification. License remains open for sharing. |
 | T05 | Done | `docs/kaggle_evidence.md`; Kaggle API claims, local measurements, anomalies, discrepancies, and remaining unknowns are recorded. E02 remains open; E03 is cleared for the documented omit-motion decision. |
 | T06 | Done | Deterministic SYNTH_ fixtures, boundary/missingness/leakage tripwires; tested. |
-| T07 | Done | Local Kaggle manifest, streaming hashes, verify CLI, secret guard; network resume is Not applicable. |
+| T07 | Done | Original local Kaggle manifest, streaming hashes, verify CLI, and secret guard; reduced working-set policy is documented separately. |
 | T08 | Done | `outputs/sample_manifest.json`; two pre-registered files match T07 and `patients.csv`, reserved for development. |
 | T09 | Done | `outputs/sample_inventory.json`; all audited files have complete stats, byte counts, hashes, and per-channel values. Both 16-channel files are quarantined and excluded from the six-channel contract; no remap is inferred. Sampling/channel semantics remain documented unknowns for T12. |
 | T10 | Done/Blocked E02 | Real-header/first-row, comma-decimal, boundary, duplicate, and missing-label tests pass. The label table contains 20 selected participants, 20 participant exclusions, and 40 retained source-row exclusions; AHI semantics remain an E02 gate. |
@@ -57,7 +58,7 @@ Last verified 24 September 2026:
 | T13 | Blocked by T12 | Canonical `.npy` signal reader not started. |
 | T14 | Blocked by T12 | Quality masks and no-zero-fill policy not implemented. |
 | T15 | Blocked by T14/E04 | Window cache and cache-hash tests not implemented. |
-| T16 | Review/Blocked by E04 | `docs/storage_ledger.md` records 23.6 GB accounted and 7.9 GiB free; reclaim or externalize storage, then repeat before cache work. |
+| T16 | Done | `docs/storage_ledger.md` records before/after trim measurements and the completed 20-file bounded streaming pilot: 24 GiB free, ~322 MiB peak RSS, no cache writes. |
 | T17 | Blocked by T12/T14/T16 | Full paired cohort audit not frozen. |
 | T18 | Blocked by E05/T12 | `docs/cohort_redesign.md` replaces the unsupported 80/20 + five-fold design with 20 participant-level leave-one-participant-out outer folds; versioned split manifests and support tests are still required. |
 | T19 | Done | Train-only fitted transforms with held-out sentinel/order tests. |
@@ -99,9 +100,10 @@ Last verified 24 September 2026:
 
 ## Current Stop Point
 
-Frontier (L0): T12 contract freeze preparation (E02/E03/E04/E05 evidence
-review) and T16 storage remediation. The full layered execution order is in
-`docs/epics_and_testing_seams.md §5`. No split, feature extraction, cache
-generation, model training, CV, or held-out scoring may begin before the
-corresponding status changes here and the tests listed in
+The next executable work is T12 contract freeze preparation and T18
+implementation of the C04 fold manifests. T16 storage verification is complete
+for bounded CPU streaming. The full layered execution order is in
+`docs/epics_and_testing_seams.md §5`. No split,
+feature extraction, cache generation, model training, CV, or held-out scoring
+may begin before the corresponding status changes here and the tests listed in
 `docs/epics_and_testing_seams.md` pass.
