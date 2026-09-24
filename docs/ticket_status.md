@@ -13,7 +13,7 @@ present. It does not clear a later scientific or protocol gate.
 
 Last verified 17 September 2026:
 
-- `main` is pushed through commit `1052e1e`.
+- `main` is pushed through commit `919564d`.
 - GitHub tracker: 14 issues closed (T01–T04, T06–T08, T19, T24–T26,
   T34–T35, and C01); 35 issues remain open because they are review,
   provisional, blocked, or pending.
