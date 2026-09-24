@@ -113,12 +113,39 @@ Notation: STOP = do not start listed downstream work until the test passes. Only
 - T44 — STOP T45 until numbers reconcile with saved predictions, bootstrap gaps state model/class conditioning, no equivalence claim or invented AHI present, failed runs prominent.
 - Conditional C01/C02/C03/C04 are never silently required; each is a separately estimated bounded session triggered only on the evidence stated in the .docx.
 
-## 5. Recommended next sessions (unchanged order, with stop tests inserted)
+## 5. Execution order (layered frontier)
 
-1. T12: freeze the channel, omit-motion, label, and quality contract after E02/E04 evidence review.
-2. T16: resolve storage capacity and repeat the E04 ledger before cache work.
-3. T18: implement the C04 fold manifests and support/disjointness tests.
-4. T12 freeze, then implement T13–T18 with S05–S07 stop tests.
+Derived from the open-ticket dependency DAG on 24 September 2026. Same layer =
+parallelizable; a layer starts only after every prior layer's gate passes.
+Conditional tickets (C02/C03) never enter this order; they open only on their
+stated trigger. C04 is Done (`docs/cohort_redesign.md`), so it is no longer a
+frontier session.
+
+| Layer | Tickets | Gate / purpose |
+|---|---|---|
+| L0 | T12, T16 | Frontier now: contract freeze (needs E02/E04) + storage remediation (E04) |
+| L1 | T13 | Canonical `.npy` readers |
+| L2 | T14 | Alignment + quality masks (S05) |
+| L3 | T15, T17 | Window caches (S06); full paired cohort audit |
+| L4 | T18, T20, T21, T22 | Participant splits (C04 manifests); feature modules (S08) |
+| L5 | T23, T31 | Paired matrices; neural loader + E04 batch pilot (S13) |
+| L6 | T27, T32 | Training harness (S12); neural architecture (S13) |
+| L7 | T28, T29, T30, T33 | Conventional adapters; neural integration |
+| L8 | T36 | INTEGRATION GATE |
+| L9 | T37, T38, T39 | Development CV, all fold jobs reviewed |
+| L10 | T40 | RELEASE GATE: freeze manifest |
+| L11 | T41, T42 | Final refits (six conventional, two neural) |
+| L12 | T43 | FIRST TEST SCORING |
+| L13 | T44 | Final comparison report |
+| L14 | T45 | Reproducibility package |
+
+Critical path (15 nodes): T12 → T13 → T14 → T17 → T18 → T23 → T27 → T28 → T36 →
+T37 → T40 → T41 → T43 → T44 → T45.
+
+Frontier blockers: T12 waits on E02 label semantics (T10 is Done/Blocked E02) and
+E04 capacity (cleared by T16); E03 is already cleared for omit-motion and E05 is
+resolved by C04, pending the T18 manifests/tests. Stop tests per layer are in §4
+and §7.
 
 ## 6. Acceptance check for this organization
 

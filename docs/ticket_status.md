@@ -99,8 +99,9 @@ Last verified 24 September 2026:
 
 ## Current Stop Point
 
-The next executable work is T12 contract freeze preparation, T16 storage
-remediation, and T18 implementation of the C04 fold manifests. No split,
-feature extraction, cache generation, model training, CV, or held-out scoring
-may begin before the corresponding status changes here and the tests listed in
+Frontier (L0): T12 contract freeze preparation (E02/E03/E04/E05 evidence
+review) and T16 storage remediation. The full layered execution order is in
+`docs/epics_and_testing_seams.md §5`. No split, feature extraction, cache
+generation, model training, CV, or held-out scoring may begin before the
+corresponding status changes here and the tests listed in
 `docs/epics_and_testing_seams.md` pass.
