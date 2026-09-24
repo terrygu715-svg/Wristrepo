@@ -63,7 +63,7 @@ Every row below must be resolved with cited evidence before its downstream gate 
 | P03 | Event/scoring definition if AHI must be reconstructed | Data reviewer (E02 owner) | Verified event taxonomy + reconciliation fixture (C01, 90-min bounded session, separately estimated parser/continuation). No generic event summation. | T10 stays blocked until reconciled |
 | P04 | Sleep-time denominator for AHI | Data reviewer (E02 owner) | Documented sleep-time definition + category-boundary record in T10/T12; reconciliation if reconstructed | T12, T17 |
 | P05 | Four-class category boundaries (exact cut points, inclusivity) | Project lead + Data reviewer | Signed-off config revision + channel manifest (T12); boundary-case tests in T10 | T12, T18, all training |
-| P06 | Motion representation: which actigraphy field(s), overlap with PSG, offsets, missing coverage; proxy vs omission | Data reviewer (E03 owner) | `alignment_feasibility.json` (T11): quantified offsets/coverage on samples, field-meaning docs, or explicit omit-motion decision. Documented no-motion result CAN complete T11. | T11–T12 when proxy selected; T14 quality masks |
+| P06 | Motion representation: which actigraphy field(s), overlap with PSG, offsets, missing coverage; proxy vs omission | Data reviewer (E03 owner) | `docs/alignment_feasibility.md` (T11): quantified offsets/coverage on samples, field-meaning docs, or explicit omit-motion decision. Documented no-motion result completes T11. | T11–T12 when proxy selected; T14 quality masks |
 | P07 | Alignment map trust (if a supplied map is claimed) | Data reviewer (E03 owner) | Evaluated evidence for map on samples (T11); else C02 bounded 120-min diagnosis → validated mapping or omit-motion recommendation | T14, T15 |
 | P08 | Primary Reduced set + Full superset channel lists, aliases allowed | Project lead (T12 gate) + Data reviewer | Frozen config revision + channel manifest (T12); explicit per-modality handling (T22); actigraphy enters both sets if selected | T13–T23, T31–T32 |
 | P09 | Common interval rules, minimum coverage, deterministic one-night-per-participant selection policy | Project lead (T12 gate) | Same T12 signed-off revision; cohort flow report shows each included participant has one valid label + eligible inputs (T17) | T17, T18 |
@@ -128,7 +128,8 @@ slowest of T41/T42 → T43 → T44 → T45.
 - [x] Deliverable path is `docs/decisions.md`.
 - [x] T03 commit evidence is recorded in `docs/epics_and_testing_seams.md`;
   T08 sample evidence is in `outputs/sample_manifest.json`.
-- [ ] T12 is not ready: E02/E03/E04/E05 evidence and the C04 cohort redesign
+- [ ] T12 is not ready: E02/E04/E05 evidence and the T18 split-manifest
+  implementation
   remain open.
 
 ## 7. Handoff
@@ -137,8 +138,8 @@ slowest of T41/T42 → T43 → T44 → T45.
 - Configuration/split hash: N/A (no config or splits in T01).
 - Acceptance evidence: this file’s §6 checklist + §2 owner/evidence table + §3 exclusions.
 - Unresolved issues: Kaggle license, sampling rate, channel map, AHI
-  semantics/boundaries, extreme-value meaning, E04 pilot, and C04 cohort
-  redesign; merged spec v2.0 source file absent.
+  semantics/boundaries, extreme-value meaning, E04 pilot, and T18 split
+  manifests; merged spec v2.0 source file absent.
 - Active time: ~60 min planning allowance for the original T01 snapshot.
-- Current handoff: T03/T04/T08 complete; T09/T10/T11 are review/provisional;
+- Current handoff: T03/T04/T08/T09/T10/T11 complete for their documented scopes;
   T12 and T18 remain stopped by the documented gates.

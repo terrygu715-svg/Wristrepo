@@ -49,16 +49,17 @@ confidence, not a claim that the research pipeline is complete.
 - **T05/E02:** AHI scoring rule, sleep-time denominator, subtype coverage, and
   exact category boundary evidence are still not sourced. The current 5/15/30
   values are explicit provisional defaults, not a cleared scientific gate.
-- **T09/E03:** Both 16-channel files are fully audited and quarantined, but
+- **T09/T12:** Both 16-channel files are fully audited and quarantined, but
   their extra channels are not identified. Sampling rate and per-channel
   identities remain open.
-- **T11/T14:** The omit-motion decision is provisional. No synchronization map
-  or artifact/coverage mask implementation exists; S05 has decision/audit
-  tests, not real alignment tests.
+ - **T11/T14:** T11 now has a documented omit-motion decision and E03 is cleared
+   for alignment. No synchronization map or artifact/coverage mask implementation
+   exists; S05 has decision/audit tests, while T14 quality-mask implementation
+   remains pending.
 - **C04/E05/T18:** The one-night labelled cohort has 20 participants with
-  class counts normal 1, mild 2, moderate 7, severe 10. The original 80/20
-  plus five-fold design cannot be accepted. No split manifest may be created
-  until C04 documents a defensible redesign.
+  class counts normal 1, mild 2, moderate 7, severe 10. C04 now documents
+  participant-level leave-one-participant-out outer folds; no split manifest
+  may be created until T18 implements and tests that redesign.
 - **S03:** The test suite has a synthetic cross-split tripwire, but no real
   participant-disjoint split implementation or inspection-ID enforcement.
 - **S06/T15:** No window cache exists; cache boundary, provenance-hash, and
@@ -70,7 +71,7 @@ confidence, not a claim that the research pipeline is complete.
   inner stopping/outer scoring separation, or neural epoch isolation.
 - **S13/T31/T32:** No neural loader/model exists; padding/mask invariance and
   measured RAM/backend fit are untested.
-- **T02/E04/T16:** The local dump is ~22 GiB; the T16 ledger measured 8.2 GiB
+- **T02/E04/T16:** The local dump is ~22 GiB; the T16 ledger measured 7.9 GiB
   free on 24 September, below the documented operating budget. No cache or
   training job should start until storage is reclaimed or externalized and a
   bounded streaming storage/RAM budget is measured again.

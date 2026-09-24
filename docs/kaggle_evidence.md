@@ -1,6 +1,6 @@
 # Kaggle Evidence Audit (T05, Kaggle rescoping per §7)
 
-- Status: Done (documentation and measured audit; E02/E03 gates remain open)
+- Status: Done (documentation and measured audit; E02 remains open)
 - Ticket: T05 — Audit Kaggle documentation + record measured evidence (90 min)
 - Deliverable: this file (successor to the `.docx` `docs/mesa_evidence.md` path;
   kept under a Kaggle name so the handoff trail is explicit).
@@ -75,8 +75,8 @@ parsed but not yet scientifically cleared.
 | # | Unknown | Blocks |
 |---|---------|--------|
 | U01 | Exact redistribution obligations under the page's `Open Database` / original-author license label | sharing only (see T04) |
-| U02 | None for the documented six-channel files: page states 200 Hz; whether the 16-channel files use the same rate is not established | T09 disposition, T12 |
-| U03 | The six-channel row order is documented, but the extra 10 rows in each 16-channel file remain unidentified | T09/T11 (E03), T12 |
+| U02 | None for the documented six-channel files: page states 200 Hz; whether the 16-channel files use the same rate is not established | T12 |
+| U03 | The six-channel row order is documented, but the extra 10 rows in each 16-channel file remain unidentified | T12 |
 | U04 | AHI event scoring rule, subtype coverage, and whether `TimeOfRecordInHours` is sleep time | T10 (E02), T12 |
 | U05 | ODI/NAp/NHyp labels have page-level meanings; their scoring/provenance and BP/pulse provenance remain unspecified | T10, T20 |
 | U06 | Why 20 users lack AHI (withheld vs unmeasured) | T17 exclusion rationale |
@@ -86,7 +86,8 @@ parsed but not yet scientifically cleared.
 
 - Acceptance evidence: M01–M09 table above; U01–U07 each named with owner
   (data reviewer) and blocking ticket.
-- Unresolved: U01 and U03–U07. The source audit is complete, but these
+- Unresolved: U01 and U03–U07. The source audit and T11 alignment decision are
+  complete, but these
   scientific/legal unknowns continue to block their respective gates. The
   measured half unblocks T09–T11 fieldwork; it does not authorize remapping or
   clinical interpretation.

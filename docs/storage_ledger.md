@@ -9,12 +9,12 @@ evidence for the storage portion of E04; it does not authorize cache creation.
 | Dataset directory usage | 22G | `du -sh Kaggledata` |
 | Files | 80 `.npy` nights plus `patients.csv` | `outputs/kaggle_manifest.json` |
 | Volume capacity | 228 GiB | `df -h .` |
-| Free space before any T16 work | 8.2 GiB | `df -h .` |
+| Free space at latest T16 verification | 7.9 GiB | `df -h .`, 24 Sep 2026 |
 | T02 reserve at inspection | 4 GiB for OS/browser; 8–10 GiB usable job budget | `environment_report.json` |
 
 ## Decision
 
-The source dataset is present and accounted for, but the current 8.2 GiB
+The source dataset is present and accounted for, but the current 7.9 GiB
 free-space measurement is below the documented 16 GiB unified-memory/storage
 operating budget and leaves no safe working margin for a cache or temporary
 artifacts. No download, cache generation, or signal materialization was run.

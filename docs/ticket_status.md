@@ -20,7 +20,7 @@ Last verified 24 September 2026:
   provisional, blocked, or pending.
 - Verification: 116/116 tests pass; Python compilation passes.
 - Data integrity: `outputs/kaggle_manifest.json` verifies `Kaggledata/` with
-  `OK: Kaggledata`; the T16 ledger measured 8.2 GiB free, superseding the
+  `OK: Kaggledata`; the latest T16 ledger measured 7.9 GiB free, superseding the
   earlier 19 GiB reading.
 - Generated evidence: `outputs/sample_manifest.json` is source-manifest and
   `patients.csv` verified; `outputs/sample_inventory.json` quarantines the
@@ -34,9 +34,9 @@ Last verified 24 September 2026:
 |---|---|---|
 | E01 Access | Cleared locally | `docs/kaggle_access.md`, `outputs/kaggle_manifest.json`, 80 files verified. |
 | E02 Label definition | Open | Kaggle AHI scoring rule, denominator, subtype coverage, and exact boundaries are not sourced. |
-| E03 Motion/alignment | Provisional | Omit-motion path is documented; channel map and alignment evidence remain unknown. |
-| E04 Capacity | Open | CPU verified; T16 ledger records 8.2 GiB free against the documented budget; no bounded cache/neural pilot yet. |
-| E05 Cohort support | Open | One-night cohort has 20 participants with class counts normal 1, mild 2, moderate 7, severe 10. C04 is mandatory. |
+| E03 Motion/alignment | Cleared for omit-motion | `docs/alignment_feasibility.md` documents absent motion/HR/SpO2 time series and the explicit omit decision; T12 still freezes the resulting channel/feature contract. |
+| E04 Capacity | Open | CPU verified; T16 ledger records 7.9 GiB free against the documented budget; no bounded cache/neural pilot yet. |
+| E05 Cohort support | Open | One-night cohort has 20 participants with class counts normal 1, mild 2, moderate 7, severe 10. C04 redesign is complete; T18 manifests/support tests remain. |
 
 ## Tickets
 
@@ -46,20 +46,20 @@ Last verified 24 September 2026:
 | T02 | Done | `environment_report.json`; CPU verified, CUDA unavailable. |
 | T03 | Done | Contracts/scaffold committed in `c79d223`; 14 contract tests pass. |
 | T04 | Done | `docs/kaggle_access.md`; URL, local provenance, manifest, and integrity verification. License remains open for sharing. |
-| T05 | Done | `docs/kaggle_evidence.md`; Kaggle API claims, local measurements, anomalies, discrepancies, and remaining unknowns are recorded. E02/E03 gates remain open. |
+| T05 | Done | `docs/kaggle_evidence.md`; Kaggle API claims, local measurements, anomalies, discrepancies, and remaining unknowns are recorded. E02 remains open; E03 is cleared for the documented omit-motion decision. |
 | T06 | Done | Deterministic SYNTH_ fixtures, boundary/missingness/leakage tripwires; tested. |
 | T07 | Done | Local Kaggle manifest, streaming hashes, verify CLI, secret guard; network resume is Not applicable. |
 | T08 | Done | `outputs/sample_manifest.json`; two pre-registered files match T07 and `patients.csv`, reserved for development. |
-| T09 | Done | `outputs/sample_inventory.json`; all audited files have complete stats, byte counts, hashes, and per-channel values. Both 16-channel files are quarantined and excluded from the six-channel contract; no remap is inferred. Sampling/channel semantics remain documented unknowns for T11/T12. |
+| T09 | Done | `outputs/sample_inventory.json`; all audited files have complete stats, byte counts, hashes, and per-channel values. Both 16-channel files are quarantined and excluded from the six-channel contract; no remap is inferred. Sampling/channel semantics remain documented unknowns for T12. |
 | T10 | Done/Blocked E02 | Real-header/first-row, comma-decimal, boundary, duplicate, and missing-label tests pass. The label table contains 20 selected participants, 20 participant exclusions, and 40 retained source-row exclusions; AHI semantics remain an E02 gate. |
-| T11 | Provisional/Blocked E03 | Omit-motion decision helper and tests. Need source/channel evidence or signed omission evidence before T12. |
-| T12 | Blocked | E02/E03/E04/E05 evidence and channel/quality contract are not frozen. |
+| T11 | Done | `docs/alignment_feasibility.md`; source review confirms no motion/HR/SpO2 time series or channel map. Omit-motion is explicit for both Full and Reduced, with helper regression tests. T12 still must freeze channel/feature scope. |
+| T12 | Blocked | E02/E04/E05 evidence and the channel/quality contract are not frozen. E03 is cleared for omit-motion. |
 | T13 | Blocked by T12 | Canonical `.npy` signal reader not started. |
-| T14 | Blocked by T12/T11 | Quality masks and no-zero-fill policy not implemented. |
+| T14 | Blocked by T12 | Quality masks and no-zero-fill policy not implemented. |
 | T15 | Blocked by T14/E04 | Window cache and cache-hash tests not implemented. |
-| T16 | Review/Blocked by E04 | `docs/storage_ledger.md` records 23.6 GB accounted and 8.2 GiB free; reclaim or externalize storage, then repeat before cache work. |
+| T16 | Review/Blocked by E04 | `docs/storage_ledger.md` records 23.6 GB accounted and 7.9 GiB free; reclaim or externalize storage, then repeat before cache work. |
 | T17 | Blocked by T12/T14/T16 | Full paired cohort audit not frozen. |
-| T18 | Blocked by C04/E05 | Original 80/20 + five-fold design is unsupported; redesign required before splits. |
+| T18 | Blocked by E05/T12 | `docs/cohort_redesign.md` replaces the unsupported 80/20 + five-fold design with 20 participant-level leave-one-participant-out outer folds; versioned split manifests and support tests are still required. |
 | T19 | Done | Train-only fitted transforms with held-out sentinel/order tests. |
 | T20 | Blocked by T12/T15 | Feature scope conflicts with unresolved Kaggle channel map and no HR/SpO2 time series. |
 | T21 | Blocked by T12/T15 | Full respiratory feature module not started. |
@@ -95,12 +95,12 @@ Last verified 24 September 2026:
 | C01 XML/event label reconstruction | Not applicable | Kaggle provides summary AHI in `patients.csv`; no XML source is present. Reopen only if that summary is disproven. |
 | C02 Motion repair | Not triggered | No motion representation has been established. One bounded repair session only if a source map later identifies motion. |
 | C03 Compute adjustment | Pending | Trigger only if the measured pilot exceeds RAM/disk/runtime budget. |
-| C04 Cohort redesign | Mandatory | Original class support cannot justify 80/20 + five-fold evaluation. Must document revised folds/splits or a versioned scope change before T18. |
+| C04 Cohort redesign | Done | `docs/cohort_redesign.md` selects 20 participant-level leave-one-participant-out outer folds with fixed a priori settings; T18 must build and test the manifests. |
 
 ## Current Stop Point
 
-The next executable work is T09 evidence resolution, T10/T11 gate closure,
-and the bounded C04 redesign. T12 is the next protocol gate. No split,
+The next executable work is T12 contract freeze preparation, T16 storage
+remediation, and T18 implementation of the C04 fold manifests. No split,
 feature extraction, cache generation, model training, CV, or held-out scoring
-may begin before the corresponding status changes here and the tests listed
-in `docs/epics_and_testing_seams.md` pass.
+may begin before the corresponding status changes here and the tests listed in
+`docs/epics_and_testing_seams.md` pass.

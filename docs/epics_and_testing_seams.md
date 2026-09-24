@@ -8,18 +8,18 @@
 ## 0. Repo reality check (recalculated frontier)
 
 - T01 Done: `docs/decisions.md` exists with P01–P15 owners/evidence (MESA-framed; see §7 supersession).
-- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). The latest T16 ledger measured 8.2 GiB free while `Kaggledata/` (~22 GB) sits on that disk. E04 stays open; T16 requires remediation, not a download.
+- T02 Done: `environment_report.json` exists. Verified backend = CPU. No CUDA (Apple M4, no torch/TF). The latest T16 ledger measured 7.9 GiB free while `Kaggledata/` (~22 GB) sits on that disk. E04 stays open; T16 requires remediation, not a download.
 - Data present locally (git-ignored): `Kaggledata/patients.csv` (80 rows) + `Kaggledata/polysomnographics/` (80 `.npy`, 40 users × 2 nights). Profiled in §7.
 - T03 Done: scaffold committed in `c79d223`; the status note was recorded in `e8fafdc`. The §4 gate is closed.
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
-- T05 Review: `docs/kaggle_evidence.md` records M01–M09 and U01–U07. Dataset description is sourced through a mirror; license, sampling rate, channel map, AHI semantics, and extreme-value meaning remain open.
+- T05 Done: `docs/kaggle_evidence.md` records M01–M09 and U01–U07 with Kaggle API evidence and explicit unknowns. E02 and remaining source-data questions stay open.
 - E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 116 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
 - GitHub progress: 14 finished/not-applicable issues are closed; all review, provisional, blocked, and pending issues remain open. Seam correction commit `c97b91d` is the current implementation head.
 - T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
 - T09 Done: `outputs/sample_inventory.json` records value statistics for the registered samples and both 16-channel anomalies (`User-8-Night-1.npy`, `User-14-Night-2.npy`). The anomalies are quarantined and excluded from the six-channel contract; their extra rows are unmapped and are not remapped or zero-filled.
-- T10 Implemented/Blocked at E02: labels parse comma decimals and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and boundary evidence are still unverified.
-- T11 Provisional omit-motion decision recorded by `data/alignment.py`; it is not a substitute for the unresolved channel-map/source-doc evidence.
-- Next hard stop: T12 cannot close, and C04 redesign is mandatory before T18, because the one-night cohort has only 20 participants with class support normal 1, mild 2, moderate 7, severe 10.
+- T10 Done/Blocked at E02: labels parse comma decimals, apply tested provisional lower-inclusive boundaries, and produce 20 labelled participants plus 20 participant-level exclusions (40 source rows). AHI semantics and scientific boundary sign-off remain unverified.
+- T11 Done: `docs/alignment_feasibility.md` records the source review and explicit omit-motion decision for both inputs. Unmapped channel semantics remain a T12 contract concern, not a motion claim.
+- Next hard stop: T12 cannot close, and T18 cannot generate manifests until its C04 leave-one-participant-out redesign is implemented and tested; the one-night cohort has only 20 participants with class support normal 1, mild 2, moderate 7, severe 10.
 - Full ticket ledger: `docs/ticket_status.md` (active statuses for T01–T45 and C01–C04).
 - `random_forest.py` (iris demo) is out of scope for all epics. `docs/decisions.md §3` exclusions stand.
 
@@ -95,10 +95,10 @@ Notation: STOP = do not start listed downstream work until the test passes. Only
 - T08 — STOP T09/T10/T11 downstream interpretation until the sample manifest verifies selected file hashes against T07 and joins every inspection ID to `patients.csv`; inspection IDs are development-only.
 - T09 — STOP T11/T12 until the 16-channel anomaly has a disposition and the audit records channel count, dtype, finite-value range, NaN/Inf fractions, standard deviation, extreme count, bytes, and hash.
 - T10 — STOP T12/T17 until `tests/test_labels.py` proves boundary inclusivity at every cut point (±ε both sides), comma-decimal parsing, duplicate-row rejection, participant-level missing-label exclusions, and sample IDs reconcile. AHI semantics and boundaries still require E02 evidence. If summary AHI is inadequate: STOP and open C01; T10 stays Blocked (no generic event summation).
-- T11 — STOP T12 (when proxy selected) until offsets + missing coverage are quantified on samples in `alignment_feasibility.json`. A documented no-motion (omit) decision with evidence MAY complete T11. If alignment inconsistent: STOP and open C02 (one 120-min session, then map or omit — no repair loop).
+- T11 — STOP T12 (when proxy selected) until offsets + missing coverage are quantified on samples. The documented no-motion decision in `docs/alignment_feasibility.md` completes T11. If alignment is later found inconsistent: STOP and open C02 (one 120-min session, then map or omit — no repair loop).
 - T14 — STOP T15 until `tests/test_alignment_quality.py` proves absent signal is masked (never zero-filled as zero activity) and Full/Reduced use the common policy on a synthetic offset/gap case.
 - T15 — STOP T20–T22/T31 until `tests/test_preprocessing.py` proves: no cross-participant windows, cache hash changes when preprocessing changes, labels stored separately. Amendment: record cache hash in handoff.
-- T18 — PROTOCOL GATE. STOP all of T23/T27/T31/T36 until split manifests prove IDs disjoint, class support reported, Full/Reduced share hashes, and T08–T17 inspection IDs are all in development. If counts can't support 80/20 + 5-fold: STOP and open C04 (documented revision; never silent merge).
+- T18 — PROTOCOL GATE. STOP all of T23/T27/T31/T36 until split manifests prove IDs disjoint, class support reported, Full/Reduced share hashes, and T08–T17 inspection IDs are all in development. If counts cannot support 80/20 + 5-fold, use the documented C04 revision; never silently merge classes.
 - T19 — STOP T27 until sentinel test proves held-out values don't move fitted params + feature-order determinism. Amendment: test must use SYNTH_ features only.
 - T21/T22 — STOP T23 until `tests/test_pairing.py` proves Full-only channels cannot appear in Reduced and every modality has documented handling; annotations provably unread (import/scan check).
 - T23 — STOP T27 until paired matrices prove identical IDs/labels across Full/Reduced and feature→channel provenance declared. Amendment: record row counts + manifest hash; no test-score computation allowed in this ticket.
@@ -115,9 +115,9 @@ Notation: STOP = do not start listed downstream work until the test passes. Only
 
 ## 5. Recommended next sessions (unchanged order, with stop tests inserted)
 
-1. T09: resolve the two 16-channel files, sampling rate, and channel identity evidence.
-2. T10/T11: close E02/E03 only with sourced AHI semantics and an explicit motion decision.
-3. C04: redesign the cohort split for 20 labelled participants before any T18 manifest.
+1. T12: freeze the channel, omit-motion, label, and quality contract after E02/E04 evidence review.
+2. T16: resolve storage capacity and repeat the E04 ledger before cache work.
+3. T18: implement the C04 fold manifests and support/disjointness tests.
 4. T12 freeze, then implement T13–T18 with S05–S07 stop tests.
 
 ## 6. Acceptance check for this organization
@@ -135,7 +135,7 @@ Measured profile (conda Python, read 17 Sep 2026; sampling rate still UNVERIFIED
 - `Kaggledata/polysomnographics/`: 80 `.npy`, float64. 78 files are `(6, ~5.19–6.94M)` samples ≈ 7.2–9.6 h at an assumed 200 Hz. 2 anomalies with **16 channels**: `User-8-Night-1.npy`, `User-14-Night-2.npy`. One probed file spans −3541…+3395 with per-channel means near 0 — extreme values need T09 explanation (artifact vs unit), not silent clipping.
 - `Kaggledata/patients.csv`: 80 rows (40 users × nights 1–2). Decimals use **commas** (`17,7`). Only **20 of 40 users have any AHI** (both nights labelled or neither). Labelled nights = 40, class split at 5/15/30: severe 20, moderate 15, mild 4, normal 1.
 - One-night-per-participant rule → at most **20 labelled nights**. 80/20 + 5-fold over ~16 dev participants with 1 normal total is indefensible — **C04 triggers by measurement, not opinion** (see T17/T18 below).
-- `Kaggledata/` is git-ignored and lives on the disk measured at 8.2 GiB free by T16. Storage, not download, is the T16 risk.
+- `Kaggledata/` is git-ignored and lives on the disk measured at 7.9 GiB free by T16. Storage, not download, is the T16 risk.
 
 Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 
@@ -143,20 +143,20 @@ Ticket/gate remap (MESA → Kaggle). Unlisted tickets keep their `.docx` Done:
 - T05 rescoped to "audit the Kaggle dataset page/docs": signal layout, channel identities/order, sampling rate, AHI definition and sleep-time denominator, meaning of AI/HI/ODI/NAp/NHyp columns. Every §7 anomaly (16-ch files, comma decimals, 50% label missingness, extreme values) must appear as a sourced claim or explicit unknown in `docs/kaggle_evidence.md`.
 - T07: `acquire_*.py` becomes local ingestion — manifest of all 80 files with byte sizes + hashes, header census, integrity re-check. Network resume/retry is Not applicable (record why); manifest + integrity + secret-scan stay.
 - T08: sample from local files (no transfer wait). Reserve inspected records for development; record IDs for T18 exclusion from test.
-- T09: EDF/annotation audit becomes `.npy` header + value audit — per-file shape/dtype census, inferred-vs-documented sampling rate, the two 16-channel files resolved (separate montage vs corrupt vs extra modalities), value-range/artifact report, channel-identity evidence (or explicit unknown going into T11).
+- T09: EDF/annotation audit becomes `.npy` header + value audit — per-file shape/dtype census, inferred-vs-documented sampling rate, the two 16-channel files quarantined/excluded, value-range/artifact report, and channel-identity evidence (or explicit unknown going into T12).
 - T10 Done/Blocked E02: `labels.py` parses the real `patients.csv` header/first rows with comma-decimal handling (`17,7` → 17.7), lower-inclusive provisional boundaries, duplicate rejection, and explicit missing-AHI exclusions. The output retains 20 labelled participants, 20 participant exclusions, and 40 excluded source rows. C01 (XML reconstruction) is Not applicable because no XML/event source is present; AHI scoring semantics still block E02.
-- T11: 6 channels are currently unnamed. T11 must either identify a motion/actigraphy channel with overlap evidence or take the documented omit-motion (HR + SpO₂) path — a no-motion result still completes the ticket. E03 clears either way with evidence.
+- T11 Done: six EEG channels are documented, with no motion/HR/SpO2 time series or overlap evidence. The documented omit-motion path is selected for both inputs and E03 clears for alignment; T12 still freezes the channel/feature contract.
 - T12: Reduced/Full sets are chosen from the verified Kaggle channels (≤6 + resolution of 16-ch anomalies), not MESA montages. T13–T15 read `.npy`, not EDF.
-- T16: no download. Deliverable becomes a storage-verification ledger: `df` before/after, 22 GB accounted, free-space remediation (clean or externalize) if below the T02 budget. STOP: no cache generation (T15/T23) until E04 clears on measured free space.
+- T16: no download. Deliverable becomes a storage-verification ledger: `df` before/after, 22 GB accounted, free-space remediation (clean or externalize) if below the T02 budget. Latest check is 7.9 GiB free, so T16 remains blocked and no cache generation (T15/T23) is allowed until E04 clears.
 - T17: eligible cohort is at most the 20 labelled participants (one night each). Cohort flow report must show the 20 unlabelled users excluded by rule and class support per split/fold plan.
-- T18: STOP — E05 cannot clear on the original 80/20 + 5-fold design (normal n=1). Mandatory C04 redesign session first: defensible options include fewer folds, repeated stratified splits with a declared seed budget, or a versioned scope change (e.g. two nights per participant, severity regrouping — each with its own leakage/medical justification, never silent merging). CV job counts in T37–T39, the T40 freeze, and §1 estimates update to whatever C04 documents.
+- T18: STOP — E05 cannot clear on the original 80/20 + 5-fold design (normal n=1). C04 selects 20 participant-level leave-one-participant-out outer folds with fixed a priori settings; T18 must produce versioned manifests and disjointness/support tests before any downstream CV.
 - T23 scale note: development matrices are ~16 nights (post-C04), not a MESA-scale cohort. Pairing tests (S08) are unchanged and matter more at this n.
 - T31/E04: batch-fit pilot is also a RAM pilot for float64 `.npy` windows (6 × ~6M float64 ≈ 275 MB per night in memory) — stream, don't load nights whole. T33/T39 inherit the measured policy.
 
 New STOP-AND-TEST additions from §7 (append to §4):
 
 - T05 STOP T10/T12 until the evidence doc records the sampling rate, channel identities (or unknown), AHI definition/denominator, and all four §7 anomalies with sources.
-- T09 STOP is cleared for T11–T14 regarding anomaly disposition: both 16-channel files are quarantined/excluded and the regression test asserts the finalized reason. T11/T12 remain gated by unresolved channel semantics and E02/E03 evidence.
+- T09 STOP is cleared for T11–T14 regarding anomaly disposition: both 16-channel files are quarantined/excluded and the regression test asserts the finalized reason. T11 is complete via omit-motion; T12 remains gated by unresolved channel semantics and E02/E04/E05 evidence.
 - T10 STOP is cleared for T12/T17 regarding parser mechanics: comma-decimal parsing, boundary inclusivity, and missing-label exclusion tests pass on the real `patients.csv` header/first rows. E02 AHI semantics and denominator remain a separate stop.
 - T16 STOP T15/T23 cache work until the storage ledger shows fit within the T02 budget.
-- T18 STOP T23 and everything downstream until the C04 redesign is documented and its split manifests pass disjointness + support tests.
+- T18 STOP T23 and everything downstream until `docs/cohort_redesign.md` is implemented as split manifests that pass disjointness + support tests.

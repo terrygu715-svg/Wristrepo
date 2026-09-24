@@ -148,6 +148,8 @@ class TestAlignmentDecision(unittest.TestCase):
         out = assess(6, False)
         self.assertEqual(out["decision"], "omit")
         self.assertTrue(len(out["reasons"]) >= 2)
+        self.assertTrue(any("no channel map" in reason for reason in out["reasons"]))
+        self.assertTrue(any("no motion representation" in reason for reason in out["reasons"]))
         self.assertIn("T12", out["consequence"])
 
     def test_evidenced_proxy_accepted(self):
