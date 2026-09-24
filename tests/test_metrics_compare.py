@@ -9,12 +9,14 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from sleep_apnea.evaluation.compare import compare  # noqa: E402
 from sleep_apnea.evaluation.metrics import summarize  # noqa: E402
+from sleep_apnea.contracts import validate_comparison, validate_metrics  # noqa: E402
 
 ORDER = ["normal", "mild", "moderate", "severe"]
 
 
 def _preds(pairs, order=ORDER):
     return {
+        "schema_version": 1,
         "class_order": list(order),
         "rows": [
             {
@@ -53,6 +55,7 @@ class TestMetrics(unittest.TestCase):
     def test_known_matrix_matches_hand_computation(self):
         # 4 rows: 2 true normal (1 right, 1 called mild), 2 true mild (both right).
         preds = {
+            "schema_version": 1,
             "class_order": list(ORDER),
             "rows": [
                 {"participant_id": "SYNTH_P001", "recording_id": "SYNTH_P001_N1",
@@ -83,6 +86,16 @@ class TestMetrics(unittest.TestCase):
         preds["rows"][1]["recording_id"] = preds["rows"][0]["recording_id"]
         with self.assertRaises(ValueError):
             summarize(preds)
+
+    def test_summary_is_a_valid_metrics_contract(self):
+        summary = summarize(EIGHT_PERFECT)
+        validate_metrics(summary)
+
+    def test_metrics_reject_inconsistent_n(self):
+        summary = summarize(EIGHT_PERFECT)
+        summary["n"] += 1
+        with self.assertRaises(ValueError):
+            validate_metrics(summary)
 
 
 class TestCompare(unittest.TestCase):
@@ -123,6 +136,25 @@ class TestCompare(unittest.TestCase):
     def test_missing_stratum_fails(self):
         with self.assertRaises(ValueError):
             compare(EIGHT_PERFECT, EIGHT_PERFECT, {}, "FULL", "RED")
+
+    def test_comparison_is_a_valid_contract(self):
+        out = compare(EIGHT_PERFECT, EIGHT_PERFECT, self.STRATA, "FULL", "RED")
+        validate_comparison(out)
+
+    def test_non_numeric_metric_gap_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_comparison({
+                "schema_version": 1,
+                "class_order": list(ORDER),
+                "full_run_id": "FULL",
+                "reduced_run_id": "RED",
+                "metric_gaps": {"macro_f1": "not-a-number"},
+                "n_bootstrap": 2000,
+            })
+
+    def test_non_object_predictions_fail_as_value_error(self):
+        with self.assertRaises(ValueError):
+            compare([], EIGHT_PERFECT, self.STRATA, "FULL", "RED")
 
     def test_participant_mismatch_fails(self):
         reduced = dict(EIGHT_PERFECT, rows=[dict(row) for row in EIGHT_PERFECT["rows"]])

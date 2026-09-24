@@ -46,6 +46,16 @@ class TestManifestContracts(unittest.TestCase):
                 {"records": [{"recording_id": "SYNTH_P001_N1"}]}
             )
 
+    def test_unversioned_manifest_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_manifest({"records": [{
+                "participant_id": "SYNTH_P001", "recording_id": "SYNTH_P001_N1"
+            }]})
+
+    def test_non_object_manifest_rejected_as_value_error(self):
+        with self.assertRaises(ValueError):
+            validate_manifest([])
+
 
 class TestPredictionContracts(unittest.TestCase):
     def test_valid_fixture_passes(self):
@@ -105,6 +115,16 @@ class TestPredictionContracts(unittest.TestCase):
                 }
             )
 
+    def test_unversioned_predictions_rejected(self):
+        doc = load_example("valid_predictions.json")
+        doc.pop("schema_version")
+        with self.assertRaises(ValueError):
+            validate_predictions(doc)
+
+    def test_non_object_predictions_rejected_as_value_error(self):
+        with self.assertRaises(ValueError):
+            validate_predictions([])
+
 
 class TestOtherContracts(unittest.TestCase):
     def test_metrics_rejects_bad_matrix(self):
@@ -118,6 +138,33 @@ class TestOtherContracts(unittest.TestCase):
                     "weighted_f1": 0.5,
                 }
             )
+
+    def test_metrics_rejects_bool_and_unversioned_values(self):
+        with self.assertRaises(ValueError):
+            validate_metrics({
+                "schema_version": 1,
+                "class_order": list(ORDER),
+                "confusion_matrix": [[0, 0, 0, 0] for _ in ORDER],
+                "accuracy": True,
+                "macro_f1": 0.0,
+                "weighted_f1": 0.0,
+            })
+
+    def test_metrics_require_schema_fields(self):
+        with self.assertRaises(ValueError):
+            validate_metrics({
+                "schema_version": 1,
+                "class_order": list(ORDER),
+                "confusion_matrix": [[0, 0, 0, 0] for _ in ORDER],
+            })
+        with self.assertRaises(ValueError):
+            validate_metrics({
+                "class_order": list(ORDER),
+                "confusion_matrix": [[0, 0, 0, 0] for _ in ORDER],
+                "accuracy": 0.0,
+                "macro_f1": 0.0,
+                "weighted_f1": 0.0,
+            })
 
     def test_comparison_requires_2000_bootstraps(self):
         with self.assertRaises(ValueError):
@@ -160,6 +207,16 @@ class TestOtherContracts(unittest.TestCase):
         source = {str((ROOT / d).resolve()) for d in ("src", "configs", "schemas")}
         generated = {str((ROOT / d).resolve()) for d in ("outputs", "runs")}
         self.assertTrue(source.isdisjoint(generated))
+
+    def test_config_rejects_wrong_task_and_untyped_paths(self):
+        config = json.loads((ROOT / "configs" / "example_config.json").read_text())
+        config["task"] = "wrong"
+        with self.assertRaises(ValueError):
+            validate_config(config)
+        config = json.loads((ROOT / "configs" / "example_config.json").read_text())
+        config["source_dir"] = None
+        with self.assertRaises(ValueError):
+            validate_config(config)
 
 
 if __name__ == "__main__":

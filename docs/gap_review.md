@@ -1,8 +1,9 @@
 # Gap Review and Corrections
 
 Review date: 17 September 2026. Baseline before review: 85 passing tests.
-After corrections: 102 passing tests. This review is about correctness and
-test confidence, not a claim that the research pipeline is complete.
+After the original corrections: 102 passing tests. Latest seam correction pass:
+24 September 2026, 116 passing tests. This review is about correctness and test
+confidence, not a claim that the research pipeline is complete.
 
 ## Issues Fixed
 
@@ -33,6 +34,15 @@ test confidence, not a claim that the research pipeline is complete.
   non-JSON artifact-hash payloads, and requeues jobs left `running` on resume.
 - **CLI import side effect.** `python -m sleep_apnea.data.ingest` no longer
   preloads its own module and emits a runpy warning.
+- **Versioned artifact validators were incomplete.** Contract validators now
+  reject non-object and unversioned documents, enforce required metric/config
+  fields, reject non-finite or boolean numeric values, and reconcile metric
+  sample counts with the confusion matrix. T24/T25 producers emit versioned
+  outputs that validate against their own contracts.
+- **S05 evidence could be opaque.** A motion proxy now requires a non-empty
+  source plus quantified overlap coverage and maximum offset; malformed or
+  unquantified evidence takes the documented omission path. Boolean channel
+  indices and channel-count values are rejected.
 
 ## Remaining Critical Gaps
 
@@ -69,5 +79,5 @@ test confidence, not a claim that the research pipeline is complete.
 2. Do not run T18 or any model training before the C04 split redesign is
    documented and its participant-disjointness tests pass.
 3. Do not treat T08/T09 sample outputs as empirical model results.
-4. Do not claim S06/S08/S12/S13 coverage from the current 102-test count;
+4. Do not claim S06/S08/S12/S13 coverage from the current 116-test count;
    their owning implementations and seam tests are absent.

@@ -140,9 +140,17 @@ class TestAlignmentDecision(unittest.TestCase):
         self.assertIn("T12", out["consequence"])
 
     def test_evidenced_proxy_accepted(self):
-        out = assess(6, True, motion_channels=[5], overlap_evidence="overlap.json")
+        out = assess(
+            6, True, motion_channels=[5],
+            overlap_evidence={
+                "source": "overlap.json",
+                "overlap_fraction": 0.95,
+                "max_abs_offset_seconds": 0.5,
+            },
+        )
         self.assertEqual(out["decision"], "proxy")
         self.assertEqual(out["motion_channels"], [5])
+        self.assertEqual(out["overlap_evidence"]["overlap_fraction"], 0.95)
 
     def test_claimed_motion_without_overlap_omits(self):
         out = assess(6, True, motion_channels=[5])
@@ -153,9 +161,20 @@ class TestAlignmentDecision(unittest.TestCase):
         with self.assertRaises(ValueError):
             assess(6, True, motion_channels=[6], overlap_evidence="map.json")
 
+    def test_boolean_channel_values_rejected(self):
+        with self.assertRaises(ValueError):
+            assess(True, True)
+        with self.assertRaises(ValueError):
+            assess(6, True, motion_channels=[True])
+
     def test_blank_overlap_evidence_does_not_clear_gate(self):
         out = assess(6, True, motion_channels=[1], overlap_evidence=" ")
         self.assertEqual(out["decision"], "omit")
+
+    def test_unquantified_overlap_evidence_does_not_clear_gate(self):
+        out = assess(6, True, motion_channels=[1], overlap_evidence={"source": "map.json"})
+        self.assertEqual(out["decision"], "omit")
+        self.assertIn("quantified", out["reasons"][0])
 
 
 if __name__ == "__main__":

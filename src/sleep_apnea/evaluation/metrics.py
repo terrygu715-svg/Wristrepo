@@ -63,6 +63,7 @@ def summarize(predictions: dict) -> dict:
         else 0.0
     )
     return {
+        "schema_version": 1,
         "class_order": list(order),
         "confusion_matrix": matrix,
         "confusion_matrix_transposed": [list(col) for col in zip(*matrix)],

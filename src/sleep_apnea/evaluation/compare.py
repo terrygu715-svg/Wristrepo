@@ -26,7 +26,9 @@ def _index_rows(predictions: dict) -> dict:
 
 
 def _macro_f1_of(rows: list[dict], class_order: list[str]) -> float:
-    return summarize({"class_order": list(class_order), "rows": rows})["macro_f1"]
+    return summarize({"schema_version": 1, "class_order": list(class_order), "rows": rows})[
+        "macro_f1"
+    ]
 
 
 def compare(
@@ -48,6 +50,8 @@ def compare(
         raise ValueError(f"core baseline supports metric='macro_f1', got {metric!r}")
     if n_bootstrap != N_BOOTSTRAP:
         raise ValueError(f"n_bootstrap must be {N_BOOTSTRAP} per T25, got {n_bootstrap!r}")
+    validate_predictions(full)
+    validate_predictions(reduced)
     order = validate_class_order(full.get("class_order"))
     validate_class_order(reduced.get("class_order"))
     if list(reduced["class_order"]) != list(order):
@@ -99,6 +103,7 @@ def compare(
     low = ordered[int(0.025 * n_bootstrap)]
     high = ordered[int(0.975 * n_bootstrap) - 1]
     return {
+        "schema_version": 1,
         "class_order": list(order),
         "full_run_id": full_run_id,
         "reduced_run_id": reduced_run_id,

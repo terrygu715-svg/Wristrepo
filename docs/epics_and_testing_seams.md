@@ -13,7 +13,7 @@
 - T03 Done: scaffold committed in `c79d223`; the status note was recorded in `e8fafdc`. The §4 gate is closed.
 - T04 Done (Kaggle rescoping): `docs/kaggle_access.md` — URL and publisher recorded; manifest 80 files / 23,613,965,440 bytes, verify OK. License remains UNVERIFIED (blocks sharing only).
 - T05 Review: `docs/kaggle_evidence.md` records M01–M09 and U01–U07. Dataset description is sourced through a mirror; license, sampling rate, channel map, AHI semantics, and extreme-value meaning remain open.
-- E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 102 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
+- E-B Done: implementation committed in `c79d223`; test-strengthening committed in `bbe49d9`; current suite is 116 tests. Local source ingestion is covered; network retry is explicitly Not applicable for the local Kaggle copy.
 - GitHub progress: 14 finished/not-applicable issues are closed; all review, provisional, blocked, and pending issues remain open. The pushed documentation head is `919564d`.
 - T08 Done: `outputs/sample_manifest.json` verifies two pre-registered inspection files against the canonical manifest and `patients.csv`; IDs are development-only.
 - T09 Review/Blocked: `outputs/sample_inventory.json` records value statistics and quarantines `User-8-Night-1.npy` (16 channels). Full channel identity/rate and anomaly disposition are unresolved.
@@ -43,11 +43,11 @@ Parallel rules: one schema integrator after T03; separate module owners after T1
 
 | Seam | Boundary | What must be tested (not a code mirror) | Primary ticket(s) | Failure if missed |
 |------|----------|------------------------------------------|-------------------|-------------------|
-| S01 Contract/ID integrity | schemas ↔ all manifests/predictions | Missing/empty/duplicate IDs rejected; class_order length-4 unique enforced | T03, T06 | Silent ID drops corrupt every downstream join |
+| S01 Contract/ID integrity | schemas ↔ all manifests/predictions | Missing/empty/duplicate IDs rejected; class_order length-4 unique; object/version/numeric consistency enforced | T03, T06 | Silent ID drops corrupt every downstream join |
 | S02 Acquisition integrity | local source ↔ manifest | For Kaggle: selected files match canonical size/hash, missing/corrupt files fail, logs contain no secret; network resume is Not applicable | T07, T08, T16 | Partial/replaced local files treated as complete; credential leak |
 | S03 Participant disjointness | splits ↔ everything | Dev/test/fold IDs disjoint; inspection IDs (T08–T17) forced to development; Full/Reduced share split hashes | T18, T23, T27 | Test contamination; inflated scores |
 | S04 Label boundaries | labels ↔ cohort | Exact AHI cut-point inclusivity (e.g. 5/15/30 ±ε), participant-level missing-label exclusion, duplicate-row rejection, summary-vs-reconstruction reconciliation | T10 (+C01) | Off-by-one class shift; invented AHI |
-| S05 Alignment/quality | raw signals ↔ masks | Synthetic offset/gap recovery; absent signal ≠ zero activity; Full/Reduced share common policy | T11, T14 (+C02) | Motion misalignment becomes fake signal |
+| S05 Alignment/quality | raw signals ↔ masks | Quantified proxy evidence or documented omission; synthetic offset/gap recovery; absent signal ≠ zero activity; Full/Reduced share common policy | T11, T14 (+C02) | Motion misalignment becomes fake signal |
 | S06 Cache determinism | preprocessing ↔ cache | No participant boundary crossed; hash changes with preprocessing; no globally fitted norm cached | T15 | Cache hides config change; leakage via normalization |
 | S07 Train-only fitting | splits ↔ transforms | Held-out sentinel values don't move fitted params; feature order deterministic; missing-feature fail | T19 | Scaler/imputer fitted on test |
 | S08 Full/Reduced pairing | channels ↔ features ↔ rows | Full-only channels absent in Reduced (channel-permission test); rows share identical IDs/labels | T21, T23, T28 | Reduced sees Full-only signal; comparison invalid |
@@ -62,7 +62,7 @@ Parallel rules: one schema integrator after T03; separate module owners after T1
 
 Current test files:
 
-- `tests/test_contracts.py` — S01 contract rejection.
+- `tests/test_contracts.py` — S01 contract rejection and schema/config parity.
 - `tests/test_acquisition.py` — S02 local manifest/hash/secret guard.
 - `tests/test_audit_sample.py` — S02/T08 sample join; S05 audit and omit/proxy branches.
 - `tests/test_labels.py` — S04 parsing, boundaries, duplicate rows, participant exclusions.
@@ -79,7 +79,7 @@ Future test files, blocked by their owning tickets: `tests/test_quality.py` (S05
 
 All synthetic IDs use `SYNTH_` prefix. No empirical numbers in these files.
 
-Coverage audit 17 Sep 2026 (102 tests): S01/S02/S04/S07/S09/S10/S11/S14
+Coverage audit 24 Sep 2026 (116 tests): S01/S02/S04/S07/S09/S10/S11/S14
 have meaningful unit/failure-path coverage. S05 has audit/decision coverage,
 but not real synchronization or T14 masking. S03 is fixture-only. S06/S08/S12/S13
 are not implemented and have no placeholder tests. Full details and the
@@ -89,7 +89,7 @@ remaining risks are in `docs/gap_review.md`.
 
 Notation: STOP = do not start listed downstream work until the test passes. Only tickets needing strengthening are listed; unlisted tickets keep their .docx Done as-is.
 
-- T03 — STOP T06/T19/T24/T26/T34 until `tests/test_contracts.py` (14 tests) passes AND a commit hash is recorded. This gate is now cleared by `c79d223`.
+- T03 — STOP T06/T19/T24/T26/T34 until `tests/test_contracts.py` (21 tests) passes AND a commit hash is recorded. This gate is now cleared by `c79d223`.
 - T06 — STOP T13/T15/T19 until new `tests/test_fixtures.py` proves: class-boundary rows exist, missing-block rows exist, repeated-participant rows exist, and a leakage-check fixture fails when a participant spans splits. Amendment: fixture manifest must validate via `validate_manifest`.
 - T07 — STOP T08 until `tests/test_acquisition.py` proves the local manifest catches missing/corrupt files and the secret scan passes. Network interrupt/resume is Not applicable for this already-local Kaggle source; the handoff must say so.
 - T08 — STOP T09/T10/T11 downstream interpretation until the sample manifest verifies selected file hashes against T07 and joins every inspection ID to `patients.csv`; inspection IDs are development-only.
