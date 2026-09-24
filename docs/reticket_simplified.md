@@ -108,4 +108,5 @@ Old STOP-AND-TEST seams S01–S14 fold into the Done column above instead of 14 
 Storage ledger (old T16) becomes a pre-condition on 06, not a standalone ticket — confirm?
 
 ## 6. Ticket docs (active): `docs/reticket_epics.md` (Epics A–F) + `docs/reticket_tickets.md`
-(tickets 0–7). Docs only — no env work, no code, per user direction.
+(tickets 0–7) + `docs/reticket_new_dataset.md` (rerun on a different dataset).
+Docs only — no env work, no code, per user direction.
