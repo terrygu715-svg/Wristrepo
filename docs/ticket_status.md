@@ -46,7 +46,7 @@ Last verified 24 September 2026:
 | T02 | Done | `environment_report.json`; CPU verified, CUDA unavailable. |
 | T03 | Done | Contracts/scaffold committed in `c79d223`; 14 contract tests pass. |
 | T04 | Done | `docs/kaggle_access.md`; URL, local provenance, manifest, and integrity verification. License remains open for sharing. |
-| T05 | Review | `docs/kaggle_evidence.md`; M01–M09 recorded, U01–U07 remain open. |
+| T05 | Done | `docs/kaggle_evidence.md`; Kaggle API claims, local measurements, anomalies, discrepancies, and remaining unknowns are recorded. E02/E03 gates remain open. |
 | T06 | Done | Deterministic SYNTH_ fixtures, boundary/missingness/leakage tripwires; tested. |
 | T07 | Done | Local Kaggle manifest, streaming hashes, verify CLI, secret guard; network resume is Not applicable. |
 | T08 | Done | `outputs/sample_manifest.json`; two pre-registered files match T07 and `patients.csv`, reserved for development. |
